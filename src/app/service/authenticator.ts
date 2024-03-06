@@ -26,6 +26,9 @@ export default {
     const generated_token = `${client.id}${splitMarker}${this.generateJWTToken({ secret: client.secret }, expires)}`
     return generated_token
   },
+  async generateAplicationTokenByUsernameAndPassword(username: string, password: string, expiresIn?: number): Promise<string | undefined>{
+    // TODO:
+  },
   // default: 1 day
   generateJWTToken(payload: Object, expiresIn?: number): string{
     if(!expiresIn){

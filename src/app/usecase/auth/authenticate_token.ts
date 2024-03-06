@@ -16,14 +16,14 @@ export default class AuthenticateToken{
             const tokenParts: string[] = data.token.split(splitMarker)
 
             if(tokenParts.length !== 2){
-                return data.callback(right(false))
+              return data.callback(right(false))
             }
 
             const [ requester, token ] = tokenParts
             const clientData = authenticator.getClientById(requester)
 
             if(!clientData){
-                return data.callback(right(false))
+              return data.callback(right(false))
             }
 
             authenticator.verifyToken(token, (e, decoded) => {
