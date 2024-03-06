@@ -1,19 +1,20 @@
 import express from 'express'
 import cors from 'cors'
 import http from 'http'
-import path from 'path'
+import globalRoutes from './app/route/global_routes'
+import apiRoutes from './app/route/api_routes'
 
-const __dirname = path.resolve()
 const port = 5000
 
 const app = express()
 const server = http.createServer(app)
 
 app.use(cors())
+app.use(express.json())
 
-app.use('/', express.static(path.join(__dirname, '/src/public')))
-
-// app.use('/api/v1/', routes)
+app.use('/', globalRoutes)
+app.use('/', globalRoutes)
+app.use('/api/v1/', apiRoutes)
 
 server.listen(port, () => {
     console.log(`Running at port: ${port}`)
