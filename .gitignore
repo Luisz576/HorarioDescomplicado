@@ -6,3 +6,5 @@ package.lock
 src/app/config
 
 build
+
+yarn-error.log
