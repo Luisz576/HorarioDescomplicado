@@ -6,12 +6,19 @@
   "repository": "https://github.com/Luisz576/HorarioDescomplicado.git",
   "author": "Luisz576 <56451779+Luisz576@users.noreply.github.com>",
   "scripts": {
-    "dev": "nodemon src/server",
-    "node": "node src/server"
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only ./src/server",
+    "node": "node src/server",
+    "tw": "npx tailwindcss -i ./src/tailwind_input.css -o ./src/public/styles/tailwind.css --watch"
   },
   "license": "MIT",
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.24",
+    "tailwindcss": "^3.4.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "cors": "^2.8.5",
