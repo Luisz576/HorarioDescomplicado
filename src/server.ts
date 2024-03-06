@@ -15,7 +15,7 @@ app.use(express.json())
 
 app.use('/', globalRoutes)
 app.use('/api/v1/', apiRoutes)
-app.use('/api/v1/', publicApiRoutes)
+app.use('/api/auth/', publicApiRoutes)
 
 server.listen(port, () => {
     console.log(`Running at port: ${port}`)

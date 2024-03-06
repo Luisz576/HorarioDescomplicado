@@ -1,9 +1,10 @@
-import IHttpContext from "../../domain/contracts/ihttp_context";
+import IHttpContext from "../../domain/http/ihttp_context";
 import authenticator from "../service/authenticator";
 
 export default class AuthController{
   async login(context: IHttpContext){
     const { username, password } = context.getRequest().body
+    console.log(username, password)
     if(username && password && typeof(username) == 'string' && typeof(password) == 'string'){
       const token = await authenticator.generateAplicationTokenByUsernameAndPassword(username, password)
       if(token){

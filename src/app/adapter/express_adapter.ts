@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
-import IHttpContext from "../../domain/contracts/ihttp_context"
-import IRequest from "../../domain/contracts/irequest"
-import IResponse from "../../domain/contracts/iresponse"
+import IHttpContext from "../../domain/http/ihttp_context"
+import IRequest from "../../domain/http/irequest"
+import IResponse from "../../domain/http/iresponse"
 
 export default class ExpressAdapter implements IHttpContext {
   private req
