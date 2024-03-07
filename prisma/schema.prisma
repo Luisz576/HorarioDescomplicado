@@ -26,6 +26,14 @@ model Time {
   scheduleId String
 }
 
+model Subject{
+  id   String  @id @default(uuid())
+  name String
+  classes Int @default(1)
+  teacher Teacher
+  configuration SubjectConfiguration
+}
+
 model Schedule {
   id        String      @id @default(uuid())
   schedule  Time[]
@@ -40,8 +48,6 @@ model Teacher {
   scheduleId             String
   Project                Project              @relation(fields: [projectId], references: [id])
   projectId              String
-  configuration          TeacherConfiguration @relation(fields: [teacherConfigurationId], references: [id])
-  teacherConfigurationId String
 }
 
 model Classroom {
@@ -51,6 +57,7 @@ model Classroom {
   scheduleId String
   Project    Project  @relation(fields: [projectId], references: [id])
   projectId  String
+  subjects Subject[]
 }
 
 model Project {
@@ -67,8 +74,6 @@ model Project {
 model Configuration {
   id                          String               @id @default(uuid())
   Project                     Project[]
-  defaultTeacherConfiguration TeacherConfiguration @relation(fields: [teacherConfigurationId], references: [id])
-  teacherConfigurationId      String
   preferFirstClasses          Boolean              @default(true)
   geneticConfiguration        GeneticConfiguration @relation(fields: [geneticConfigurationId], references: [id])
   geneticConfigurationId      String
@@ -96,10 +101,8 @@ model GeneticConfiguration {
   stopMethod           StopMethod      @default(GENERATIONS_WITHOUT_BETTER_SCORE)
 }
 
-model TeacherConfiguration {
+model SubjectConfiguration {
   id                          String          @id @default(uuid())
-  Configuration               Configuration[]
-  Teacher                     Teacher[]
   minConsecutiveClasses       Int             @default(2)
   maxConsecutiveClasses       Int             @default(4)
   preferMaxConsecutiveClasses Boolean         @default(false)
