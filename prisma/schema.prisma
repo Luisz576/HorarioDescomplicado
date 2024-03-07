@@ -26,14 +26,6 @@ model Time {
   scheduleId String
 }
 
-model Subject{
-  id   String  @id @default(uuid())
-  name String
-  classes Int @default(1)
-  teacher Teacher
-  configuration SubjectConfiguration
-}
-
 model Schedule {
   id        String      @id @default(uuid())
   schedule  Time[]
@@ -42,22 +34,35 @@ model Schedule {
 }
 
 model Teacher {
+  id         String    @id @default(uuid())
+  name       String
+  schedule   Schedule  @relation(fields: [scheduleId], references: [id])
+  scheduleId String
+  Project    Project   @relation(fields: [projectId], references: [id])
+  projectId  String
+  Subject    Subject[]
+}
+
+model Subject {
   id                     String               @id @default(uuid())
   name                   String
-  schedule               Schedule             @relation(fields: [scheduleId], references: [id])
-  scheduleId             String
-  Project                Project              @relation(fields: [projectId], references: [id])
-  projectId              String
+  classes                Int                  @default(1)
+  configuration          SubjectConfiguration @relation(fields: [subjectConfigurationId], references: [id])
+  teacher                Teacher              @relation(fields: [teacherId], references: [id])
+  teacherId              String
+  subjectConfigurationId String
+  Classroom              Classroom           @relation(fields: [classroomId], references: [id])
+  classroomId            String
 }
 
 model Classroom {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   name       String
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  schedule   Schedule  @relation(fields: [scheduleId], references: [id])
   scheduleId String
-  Project    Project  @relation(fields: [projectId], references: [id])
+  Project    Project   @relation(fields: [projectId], references: [id])
   projectId  String
-  subjects Subject[]
+  subjects   Subject[]
 }
 
 model Project {
@@ -72,11 +77,11 @@ model Project {
 }
 
 model Configuration {
-  id                          String               @id @default(uuid())
-  Project                     Project[]
-  preferFirstClasses          Boolean              @default(true)
-  geneticConfiguration        GeneticConfiguration @relation(fields: [geneticConfigurationId], references: [id])
-  geneticConfigurationId      String
+  id                     String               @id @default(uuid())
+  Project                Project[]
+  preferFirstClasses     Boolean              @default(true)
+  geneticConfiguration   GeneticConfiguration @relation(fields: [geneticConfigurationId], references: [id])
+  geneticConfigurationId String
 }
 
 enum TrainingMethod {
@@ -102,8 +107,9 @@ model GeneticConfiguration {
 }
 
 model SubjectConfiguration {
-  id                          String          @id @default(uuid())
-  minConsecutiveClasses       Int             @default(2)
-  maxConsecutiveClasses       Int             @default(4)
-  preferMaxConsecutiveClasses Boolean         @default(false)
+  id                          String    @id @default(uuid())
+  minConsecutiveClasses       Int       @default(2)
+  maxConsecutiveClasses       Int       @default(4)
+  preferMaxConsecutiveClasses Boolean   @default(false)
+  Subject                     Subject[]
 }
