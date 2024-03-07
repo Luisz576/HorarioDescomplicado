@@ -8,3 +8,7 @@ src/app/config
 build
 
 yarn-error.log
+
+.env
+
+prisma/migrations

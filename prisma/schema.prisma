@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,102 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum DayOfWeek {
+  MONDAY
+  SUNDAY
+  TUESDAY
+  WEDNESDAY
+  THUSDAY
+  FRIDAY
+  SATURDAY
+}
+
+model Time {
+  id         String    @id @default(uuid())
+  day        DayOfWeek
+  startTime  String
+  endTime    String
+  Schedules  Schedule  @relation(fields: [scheduleId], references: [id])
+  scheduleId String
+}
+
+model Schedule {
+  id        String      @id @default(uuid())
+  schedule  Time[]
+  Teacher   Teacher[]
+  Classroom Classroom[]
+}
+
+model Teacher {
+  id                     String               @id @default(uuid())
+  name                   String
+  schedule               Schedule             @relation(fields: [scheduleId], references: [id])
+  scheduleId             String
+  Project                Project              @relation(fields: [projectId], references: [id])
+  projectId              String
+  configuration          TeacherConfiguration @relation(fields: [teacherConfigurationId], references: [id])
+  teacherConfigurationId String
+}
+
+model Classroom {
+  id         String   @id @default(uuid())
+  name       String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId String
+  Project    Project  @relation(fields: [projectId], references: [id])
+  projectId  String
+}
+
+model Project {
+  id              String        @id @default(uuid())
+  name            String        @unique
+  classrooms      Classroom[]
+  teachers        Teacher[]
+  configuration   Configuration @relation(fields: [configurationId], references: [id])
+  configurationId String
+
+  @@index([name])
+}
+
+model Configuration {
+  id                          String               @id @default(uuid())
+  Project                     Project[]
+  defaultTeacherConfiguration TeacherConfiguration @relation(fields: [teacherConfigurationId], references: [id])
+  teacherConfigurationId      String
+  preferFirstClasses          Boolean              @default(true)
+  geneticConfiguration        GeneticConfiguration @relation(fields: [geneticConfigurationId], references: [id])
+  geneticConfigurationId      String
+}
+
+enum TrainingMethod {
+  RANK
+  ROULETTE
+  COMPETITION
+}
+
+enum StopMethod {
+  MAX_GENERATIONS
+  GENERATIONS_WITHOUT_BETTER_SCORE
+}
+
+model GeneticConfiguration {
+  id                   String          @id @default(uuid())
+  Configuration        Configuration[]
+  populationSize       Int             @default(100)
+  eliteSize            Int             @default(3)
+  randomIndividualSize Int             @default(1)
+  mutationRate         Decimal         @default(0.1)
+  trainingMethod       TrainingMethod  @default(COMPETITION)
+  stopMethod           StopMethod      @default(GENERATIONS_WITHOUT_BETTER_SCORE)
+}
+
+model TeacherConfiguration {
+  id                          String          @id @default(uuid())
+  Configuration               Configuration[]
+  Teacher                     Teacher[]
+  minConsecutiveClasses       Int             @default(2)
+  maxConsecutiveClasses       Int             @default(4)
+  preferMaxConsecutiveClasses Boolean         @default(false)
 }
