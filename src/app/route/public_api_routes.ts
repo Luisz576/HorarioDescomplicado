@@ -5,7 +5,6 @@ import authControllerFactory from '../factory/auth/auth_controller_factory'
 const routes = Router()
 
 const authController = authControllerFactory()
-
 routes.post('/login', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return authController.login(adapter)

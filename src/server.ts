@@ -14,8 +14,8 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/', globalRoutes)
-app.use('/api/v1/', apiRoutes)
 app.use('/api/auth/', publicApiRoutes)
+app.use('/api/v1/', apiRoutes)
 
 server.listen(port, () => {
     console.log(`Running at port: ${port}`)
