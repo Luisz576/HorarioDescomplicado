@@ -1,4 +1,4 @@
-import { Either } from "../../app/utils/either"
+import { Either } from "../../core/utils/either"
 import IProject from "../model/iproject"
 
 export interface CreateProjectProps{

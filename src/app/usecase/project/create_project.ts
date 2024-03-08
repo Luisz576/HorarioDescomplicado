@@ -3,7 +3,7 @@ import IConfigurationRepository from "../../../domain/repository/configuration/i
 import IProjectRepository, { CreateProjectProps } from "../../../domain/repository/iproject_repository"
 import configurationRepository from "../../repository/configuration/configuration_repository"
 import projectRepository from "../../repository/project_repository"
-import { Either, left, right } from "../../utils/either"
+import { Either, left, right } from "../../../core/utils/either"
 
 class CreateProject{
   constructor(

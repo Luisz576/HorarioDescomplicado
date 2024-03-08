@@ -51,7 +51,7 @@ model Subject {
   teacher                Teacher              @relation(fields: [teacherId], references: [id])
   teacherId              String
   subjectConfigurationId String
-  Classroom              Classroom           @relation(fields: [classroomId], references: [id])
+  Classroom              Classroom            @relation(fields: [classroomId], references: [id])
   classroomId            String
 }
 
@@ -84,7 +84,7 @@ model Configuration {
   geneticConfigurationId String
 }
 
-enum TrainingMethod {
+enum SelectionMethod {
   RANK
   ROULETTE
   COMPETITION
@@ -102,7 +102,7 @@ model GeneticConfiguration {
   eliteSize            Int             @default(3)
   randomIndividualSize Int             @default(1)
   mutationRate         Decimal         @default(0.1)
-  trainingMethod       TrainingMethod  @default(COMPETITION)
+  selectionMethod      SelectionMethod @default(COMPETITION)
   stopMethod           StopMethod      @default(GENERATIONS_WITHOUT_BETTER_SCORE)
 }
 
