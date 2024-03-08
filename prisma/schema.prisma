@@ -99,7 +99,7 @@ model GeneticConfiguration {
   id                   String          @id @default(uuid())
   Configuration        Configuration[]
   populationSize       Int             @default(100)
-  eliteSize            Int             @default(3)
+  rankSlice            Int             @default(3)
   randomIndividualSize Int             @default(1)
   mutationRate         Decimal         @default(0.1)
   selectionMethod      SelectionMethod @default(COMPETITION)

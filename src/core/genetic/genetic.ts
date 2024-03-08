@@ -5,12 +5,12 @@ import randomInt from "../utils/random_int";
 
 interface GeneticConfiguration{
   populationSize?: number
-  eliteSize?: number
   randomIndividualSize?: number
   mutationRate?: number
   selectionMethod?: SelectionMethod
   maxGenerations?: number
   rankSlice?: number
+  roundsOfRoulette?: number
 }
 
 interface GeneticMethods<Phenotype>{
@@ -40,12 +40,12 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
   defaultConfig(): Required<GeneticConfiguration>{
     return {
       populationSize: 20,
-      eliteSize: 1,
       randomIndividualSize: 0,
       mutationRate: 0.1,
       selectionMethod: 'COMPETITION',
       maxGenerations: 10,
-      rankSlice: 1
+      rankSlice: 1,
+      roundsOfRoulette: 1
     }
   }
   updateConfig(configuration: GeneticConfiguration){
@@ -54,12 +54,12 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
   configWithDefaults(configuration: Partial<GeneticConfiguration>, defaults: Required<GeneticConfiguration>): Required<GeneticConfiguration>{
     return {
       populationSize: configuration.populationSize ? configuration.populationSize : defaults.populationSize,
-      eliteSize: configuration.eliteSize ? configuration.eliteSize : defaults.eliteSize,
       randomIndividualSize: configuration.randomIndividualSize ? configuration.randomIndividualSize : defaults.randomIndividualSize,
       mutationRate: configuration.mutationRate ? configuration.mutationRate : defaults.mutationRate,
       selectionMethod: configuration.selectionMethod ? configuration.selectionMethod : defaults.selectionMethod,
       maxGenerations: configuration.maxGenerations ? configuration.maxGenerations : defaults.maxGenerations,
-      rankSlice: configuration.rankSlice ? configuration.rankSlice : defaults.rankSlice
+      rankSlice: configuration.rankSlice ? configuration.rankSlice : defaults.rankSlice,
+      roundsOfRoulette: configuration.roundsOfRoulette ? configuration.roundsOfRoulette : defaults.roundsOfRoulette
     }
   }
   config(){
@@ -68,13 +68,16 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
 
   // population
   #populate(){
+    if(this.#population.length == 1 && this.#config.populationSize > 1){
+      this.#population.push(this.#mutatePhenotypeFunction(this.#population[0]))
+    }
     var size = this.#population.length
     while(this.#population.length < this.#config.populationSize){
-      this.#population.push(
-        this.#mutatePhenotypeFunction(
-          this.#population[randomInt(size)]
-        )
-      )
+      if(Math.random() < this.#config.mutationRate){
+        this.#population.push(this.#mutatePhenotypeFunction(this.#population[randomInt(size)]))
+      } else {
+        this.#population.push(this.#crossoverFunction(this.#population[randomInt(size)]))
+      }
     }
   }
 
@@ -115,13 +118,8 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
         let phenotype = this.#population[i]
         let competitor = this.#population[i+1]
 
-        nextGeneration.push(phenotype)
         if(this.#doesABeatBFunction(phenotype, competitor)){
-            if(Math.random() < this.#config.mutationRate){
-                nextGeneration.push(this.#mutatePhenotypeFunction(phenotype))
-            } else {
-                nextGeneration.push(this.#crossoverFunction(phenotype))
-            }
+          nextGeneration.push(phenotype)
         }else{
             nextGeneration.push(competitor)
         }
@@ -131,11 +129,46 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
   }
 
   #rank(){
-    this.#population = this.scores(true).map((a) => a.phenotype).slice(0, this.#config.rankSlice)
+    this.#population = this.bestPhenotypes(this.#config.rankSlice)
   }
 
   #roulette(){
+    let nextGeneration: Phenotype[] = []
+    let sortedPopulation = this.scores(true)
 
+    for(let i = 0; i < this.#config.roundsOfRoulette; i++){
+      let index = this.#roulettePhenotype(sortedPopulation)
+      nextGeneration.push(sortedPopulation.slice(index, 1)[0].phenotype)
+    }
+
+    this.#population = nextGeneration
+  }
+  #roulettePhenotype(sortedPopulation: { score: number; phenotype: Phenotype; }[]): number{
+    let min = Number.POSITIVE_INFINITY
+    for(let p in sortedPopulation){
+      if(sortedPopulation[p].score < min){
+        min = sortedPopulation[p].score
+      }
+    }
+
+    let fixMin = 0
+    if(min < 0){
+      fixMin = min * -1
+    }
+    let total = 0.0
+    for(let p in sortedPopulation){
+      sortedPopulation[p].score = sortedPopulation[p].score + fixMin
+      total += sortedPopulation[p].score
+    }
+
+    let r = Math.random()
+    for(let i = 0; i < sortedPopulation.length; i++){
+      if(r < (sortedPopulation[i].score*1.0 / total)){
+        return i
+      }
+    }
+
+    return 0
   }
 
   // utils
@@ -143,33 +176,42 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
     if(phenotypes.length > this.#config.populationSize){
       throw new Error('So many phenotypes to insert')
     }
+
     let alreadyUsed: number[] = []
     for(let i = 0; i < phenotypes.length; i++){
-      let targetIndex = randomInt(this.#config.populationSize)
+      let targetIndex = this.#population.length
+
+      if(this.#population.length >= this.#config.populationSize){
+        targetIndex = randomInt(this.#config.populationSize)
+      }
+
       if(alreadyUsed.includes(targetIndex)){
         i--
         continue
       }
+
       if(this.#population.length <= targetIndex){
         targetIndex = this.#population.length
         this.#population.push(cloneJson(phenotypes[i]))
       }else{
         this.#population[targetIndex] = phenotypes[i]
       }
+
       alreadyUsed.push(targetIndex)
     }
   }
 
   // implementation
+  isPopulationComplete(): boolean{
+    return this.#population.length >= this.#config.populationSize
+  }
   evolve(): IGenetic<Phenotype> {
-    let nextGeneration = []
-    nextGeneration.push(...this.elite(this.#config.eliteSize))
-    nextGeneration.push(...this.randomPhenotypes(this.#config.randomIndividualSize))
+    if(!this.isPopulationComplete()){
+      this.#populate()
+      this.#randomizePopulationOrder()
+    }
 
-    this.#population = nextGeneration
-
-    this.#populate()
-    this.#randomizePopulationOrder()
+    let nextGeneration = this.randomPhenotypes(this.#config.randomIndividualSize)
 
     switch(this.#config.selectionMethod){
       case 'COMPETITION':
@@ -183,20 +225,27 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
         break
     }
 
+    if(nextGeneration.length > 0){
+      this.insertRandomly(nextGeneration)
+    }
+
+    this.#populate()
+    this.#randomizePopulationOrder()
+
     return this
   }
-  elite(n_elite?: number | undefined): Phenotype[] {
-    if(!n_elite){
-      n_elite = 1
+  bestPhenotypes(n?: number | undefined): Phenotype[] {
+    if(!n){
+      n = 1
     }
-    if(n_elite > this.#config.populationSize){
-      throw new Error("'n_elite' must be less than 'populationSize'")
-    }else if(n_elite < 0){
-      throw new Error("'n_elite' must be grater or equal than 0")
+    if(n > this.#config.populationSize){
+      throw new Error("'n' must be less than 'populationSize'")
+    }else if(n < 0){
+      throw new Error("'n' must be grater or equal than 0")
     }
     return this.scores(true)
               .map((s) => s.phenotype)
-              .slice(0, this.#config.eliteSize)
+              .slice(0, n)
   }
   scores(ranked?: boolean): {score: number, phenotype: Phenotype}[] {
     let scoredPopulation = this.population().map((phenotype) => {
