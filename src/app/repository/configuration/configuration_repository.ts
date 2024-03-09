@@ -32,16 +32,73 @@ class ConfigurationRepository implements IConfigurationRepository{
       return left("Couldn't create genetic configuration: " + e)
     }
   }
-  createSubjectConfiguration(): Promise<Either<any, string>> {
+  async createSubjectConfiguration(): Promise<Either<any, string>> {
     throw new Error("Method not implemented.")
   }
-  deleteProjectConfiguration(): Promise<Either<any, boolean>> {
+  async deleteProjectConfiguration(targetId: number): Promise<Either<any, boolean>> {
+    try{
+      await prisma.configuration.delete({
+        where: {
+          id: targetId
+        }
+      })
+      return right(true)
+    }catch(e){
+      return left("couldn't delete project configuration: " + e)
+    }
+  }
+  async deleteGeneticConfiguration(targetId: number): Promise<Either<any, boolean>> {
+    try{
+      await prisma.geneticConfiguration.delete({
+        where: {
+          id: targetId
+        }
+      })
+      return right(true)
+    }catch(e){
+      return left("couldn't delete genetic configuration: " + e)
+    }
+  }
+  async deleteSubjectConfiguration(targetId: number): Promise<Either<any, boolean>> {
     throw new Error("Method not implemented.")
   }
-  deleteGeneticConfiguration(): Promise<Either<any, boolean>> {
-    throw new Error("Method not implemented.")
+  async selectProjectConfiguration(targetId: number): Promise<Either<any, IProjectConfiguration | null>>{
+    try{
+      return right(
+        await prisma.configuration.findFirst({
+          where: {
+            id: targetId
+          }
+        })
+      )
+    }catch(e){
+      return left(e)
+    }
   }
-  deleteSubjectConfiguration(): Promise<Either<any, boolean>> {
+  async selectGeneticConfiguration(targetId: number): Promise<Either<any, IGeneticConfiguration | null>>{
+    try{
+      const gc = await prisma.geneticConfiguration.findFirst({
+        where: {
+          id: targetId
+        }
+      })
+      if(gc == null){
+        return right(null)
+      }
+      return right({
+        id: gc.id,
+        mutationRate: gc.mutationRate.toNumber(),
+        populationSize: gc.populationSize,
+        randomIndividualSize: gc.randomIndividualSize,
+        rankSlice: gc.rankSlice,
+        selectionMethod: gc.selectionMethod,
+        stopMethod: gc.stopMethod
+      })
+    }catch(e){
+      return left(e)
+    }
+  }
+  async selectSubjectConfiguration(targetId: number): Promise<Either<any, any | null>>{
     throw new Error("Method not implemented.")
   }
 }

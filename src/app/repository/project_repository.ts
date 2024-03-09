@@ -1,5 +1,5 @@
 import IProject from "../../core/domain/model/iproject";
-import IProjectRepository, { CreateProjectProps } from "../../core/domain/repository/iproject_repository"
+import IProjectRepository, { CreateProjectProps, SearchProjectQuery } from "../../core/domain/repository/iproject_repository"
 import prisma from "../service/prisma";
 import { Either, left, right } from "../../core/utils/either"
 
@@ -10,6 +10,7 @@ class ProjectRepository implements IProjectRepository{
       const res = await prisma.project.create({
         data: {
           name: props.name,
+          ownerId: props.ownerId,
           configurationId: props.configurationId
         }
       })
@@ -40,7 +41,29 @@ class ProjectRepository implements IProjectRepository{
       })
       return right(true)
     }catch(e){
-      return left("couldn't update project: " + e)
+      return left("couldn't delete project: " + e)
+    }
+  }
+  async selectFirst(query: SearchProjectQuery): Promise<Either<any, IProject | null>> {
+    try{
+      return right(
+        await prisma.project.findFirst({
+          where: query
+        })
+      )
+    }catch(e){
+      return left(e)
+    }
+  }
+  async selectAll(query: SearchProjectQuery): Promise<Either<any, IProject[]>> {
+    try{
+      return right(
+        await prisma.project.findMany({
+          where: query
+        })
+      )
+    }catch(e){
+      return left(e)
     }
   }
 }

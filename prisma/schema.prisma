@@ -68,6 +68,7 @@ model Classroom {
 model Project {
   id              Int           @id @default(autoincrement())
   name            String        @unique
+  ownerId         String
   classrooms      Classroom[]
   teachers        Teacher[]
   configuration   Configuration @relation(fields: [configurationId], references: [id])

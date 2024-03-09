@@ -9,9 +9,12 @@ export interface CreateProjectConfigurationProps{
 export default interface IConfigurationRepository{
   createProjectConfiguration(props: CreateProjectConfigurationProps): Promise<Either<any, IProjectConfiguration>>
   createGeneticConfiguration(): Promise<Either<any, IGeneticConfiguration>>
-  createSubjectConfiguration(): Promise<Either<any, string>>
-  deleteProjectConfiguration(): Promise<Either<any, Boolean>>
-  deleteGeneticConfiguration(): Promise<Either<any, Boolean>>
-  deleteSubjectConfiguration(): Promise<Either<any, Boolean>>
+  createSubjectConfiguration(): Promise<Either<any, any>>
+  deleteProjectConfiguration(targetId: number): Promise<Either<any, Boolean>>
+  deleteGeneticConfiguration(targetId: number): Promise<Either<any, Boolean>>
+  deleteSubjectConfiguration(targetId: number): Promise<Either<any, Boolean>>
+  selectProjectConfiguration(targetId: number): Promise<Either<any, IProjectConfiguration | null>>
+  selectGeneticConfiguration(targetId: number): Promise<Either<any, IGeneticConfiguration | null>>
+  selectSubjectConfiguration(targetId: number): Promise<Either<any, any | null>>
   // TODO: edit config
 }

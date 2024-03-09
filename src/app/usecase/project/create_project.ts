@@ -10,8 +10,11 @@ class CreateProject{
     private projectRepository: IProjectRepository,
     private configurationRepository: IConfigurationRepository
   ){}
-  async exec(props: Omit<CreateProjectProps, 'configurationId'>): Promise<Either<any, IProject>>{
-    if(props.name && props.name.trim() != ""){
+  async exec(props: Partial<Omit<CreateProjectProps, 'configurationId'>>): Promise<Either<any, IProject>>{
+    if(props.name && props.name.trim() != "" && props.ownerId && props.ownerId.trim() != ""){
+      props.name = props.name.trim()
+      props.ownerId = props.ownerId.trim()
+
       const gcRes = await this.configurationRepository.createGeneticConfiguration()
       if(gcRes.isRight()){
         const pcRes = await this.configurationRepository.createProjectConfiguration({
@@ -20,6 +23,7 @@ class CreateProject{
         if(pcRes.isRight()){
           const res = await this.projectRepository.create({
             name: props.name,
+            ownerId: props.ownerId,
             configurationId: pcRes.value.id,
           })
           if(res.isRight()){

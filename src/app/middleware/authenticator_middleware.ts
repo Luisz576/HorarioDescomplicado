@@ -13,7 +13,7 @@ export default class AuthenticatorMiddleware{
               token: auth_token,
               callback: (authentication_response) => {
                   if(authentication_response.isRight()){
-                      if(authentication_response.value){
+                      if(authentication_response.value != undefined){
                         return httpContext.next()
                       }
                       return httpContext.getResponse().sendStatus(401)

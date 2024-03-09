@@ -4,19 +4,11 @@ import IRequest from "../../core/domain/http/irequest"
 import IResponse from "../../core/domain/http/iresponse"
 
 export default class ExpressAdapter implements IHttpContext {
-  private req
-  private res
-  private nextFunction
-
   constructor(
-    req: Request,
-    res: Response,
-    nextFunction: NextFunction
-  ){
-      this.req = req
-      this.res = res
-      this.nextFunction = nextFunction
-  }
+    private req: Request,
+    private res: Response,
+    private nextFunction: NextFunction
+  ){}
 
   getRequest(): IRequest {
       return this.req

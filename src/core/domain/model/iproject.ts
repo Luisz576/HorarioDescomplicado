@@ -1,5 +1,6 @@
 export default interface IProject{
-  id: number;
+  id: number
   name: string
+  ownerId: string
   configurationId: number
 }
