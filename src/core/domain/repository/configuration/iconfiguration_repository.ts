@@ -1,4 +1,4 @@
-import { Either } from "../../../core/utils/either"
+import { Either } from "../../../utils/either"
 import IGeneticConfiguration from "../../model/configuration/igenetic_configuration"
 import IProjectConfiguration from "../../model/configuration/iproject_configuration"
 

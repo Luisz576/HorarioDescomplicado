@@ -1,4 +1,4 @@
-import IGenetic from "../../domain/genetic/igenetic";
+import IGenetic from "../../lib/genetic/igenetic";
 import ScheduleOrganizerPhenotype from "./phenotype";
 
 export default class ScheduleOrganizer{

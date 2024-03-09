@@ -1,5 +1,5 @@
-import IProject from "../../domain/model/iproject";
-import IProjectRepository, { CreateProjectProps } from "../../domain/repository/iproject_repository"
+import IProject from "../../core/domain/model/iproject";
+import IProjectRepository, { CreateProjectProps } from "../../core/domain/repository/iproject_repository"
 import prisma from "../service/prisma";
 import { Either, left, right } from "../../core/utils/either"
 

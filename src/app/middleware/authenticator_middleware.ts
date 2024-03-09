@@ -1,4 +1,4 @@
-import IHttpContext from "../../domain/http/ihttp_context"
+import IHttpContext from "../../core/domain/http/ihttp_context"
 import AuthenticateToken from "../usecase/auth/authenticate_token"
 import logError from "../../core/utils/log_error"
 

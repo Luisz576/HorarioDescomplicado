@@ -1,16 +1,14 @@
-import IGenetic from "../../domain/genetic/igenetic";
-import SelectionMethod from "../../domain/genetic/selection_method";
-import cloneJson from "../utils/clone_json";
-import randomInt from "../utils/random_int";
+import IGenetic from "./igenetic";
+import SelectionMethod from "./selection_method";
+import { cloneJson, randomInt } from './utils'
 
 interface GeneticConfiguration{
-  populationSize?: number
-  randomIndividualSize?: number
-  mutationRate?: number
-  selectionMethod?: SelectionMethod
-  maxGenerations?: number
-  rankSlice?: number
-  roundsOfRoulette?: number
+  populationSize: number
+  randomIndividualSize: number
+  mutationRate: number
+  selectionMethod: SelectionMethod
+  rankSlice: number
+  roundsOfRoulette: number
 }
 
 interface GeneticMethods<Phenotype>{
@@ -22,10 +20,10 @@ interface GeneticMethods<Phenotype>{
 
 export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
   #population: Phenotype[] = []
-  #config: Required<GeneticConfiguration> = this.defaultConfig()
+  #config: GeneticConfiguration = this.defaultConfig()
 
   constructor(
-    configuration: GeneticConfiguration,
+    configuration: Partial<GeneticConfiguration>,
     private methods: GeneticMethods<Phenotype>,
     initialPopulation: Phenotype[]
   ){
@@ -37,27 +35,25 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
   }
 
   // config
-  defaultConfig(): Required<GeneticConfiguration>{
+  defaultConfig(): GeneticConfiguration{
     return {
       populationSize: 20,
       randomIndividualSize: 0,
       mutationRate: 0.1,
       selectionMethod: 'COMPETITION',
-      maxGenerations: 10,
       rankSlice: 1,
       roundsOfRoulette: 1
     }
   }
-  updateConfig(configuration: GeneticConfiguration){
+  updateConfig(configuration: Partial<GeneticConfiguration>){
     this.#config = this.configWithDefaults(configuration, this.#config)
   }
-  configWithDefaults(configuration: Partial<GeneticConfiguration>, defaults: Required<GeneticConfiguration>): Required<GeneticConfiguration>{
+  configWithDefaults(configuration: Partial<GeneticConfiguration>, defaults: GeneticConfiguration): GeneticConfiguration{
     return {
       populationSize: configuration.populationSize ? configuration.populationSize : defaults.populationSize,
       randomIndividualSize: configuration.randomIndividualSize ? configuration.randomIndividualSize : defaults.randomIndividualSize,
       mutationRate: configuration.mutationRate ? configuration.mutationRate : defaults.mutationRate,
       selectionMethod: configuration.selectionMethod ? configuration.selectionMethod : defaults.selectionMethod,
-      maxGenerations: configuration.maxGenerations ? configuration.maxGenerations : defaults.maxGenerations,
       rankSlice: configuration.rankSlice ? configuration.rankSlice : defaults.rankSlice,
       roundsOfRoulette: configuration.roundsOfRoulette ? configuration.roundsOfRoulette : defaults.roundsOfRoulette
     }

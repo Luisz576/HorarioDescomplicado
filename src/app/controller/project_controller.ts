@@ -1,4 +1,4 @@
-import IHttpContext from "../../domain/http/ihttp_context";
+import IHttpContext from "../../core/domain/http/ihttp_context";
 import createProject from "../usecase/project/create_project";
 
 export default class ProjectController{

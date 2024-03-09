@@ -1,6 +1,6 @@
-import IGeneticConfiguration from "../../../domain/model/configuration/igenetic_configuration"
-import IProjectConfiguration from "../../../domain/model/configuration/iproject_configuration"
-import IConfigurationRepository, { CreateProjectConfigurationProps } from "../../../domain/repository/configuration/iconfiguration_repository"
+import IGeneticConfiguration from "../../../core/domain/model/configuration/igenetic_configuration"
+import IProjectConfiguration from "../../../core/domain/model/configuration/iproject_configuration"
+import IConfigurationRepository, { CreateProjectConfigurationProps } from "../../../core/domain/repository/configuration/iconfiguration_repository"
 import prisma from "../../service/prisma"
 import { Either, left, right } from "../../../core/utils/either"
 
