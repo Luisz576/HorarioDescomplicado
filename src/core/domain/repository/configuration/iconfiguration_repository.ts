@@ -3,7 +3,7 @@ import IGeneticConfiguration from "../../model/configuration/igenetic_configurat
 import IProjectConfiguration from "../../model/configuration/iproject_configuration"
 
 export interface CreateProjectConfigurationProps{
-  geneticConfigurationId: string
+  geneticConfigurationId: number
 }
 
 export default interface IConfigurationRepository{

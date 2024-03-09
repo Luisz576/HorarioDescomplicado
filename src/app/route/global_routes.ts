@@ -5,6 +5,6 @@ const ___dirname = path.resolve()
 
 const routes = express.Router()
 
-routes.use('/', express.static(path.join(___dirname, '/src/public')))
+routes.use('/horariodescomplicado', express.static(path.join(___dirname, '/src/public')))
 
 export default routes

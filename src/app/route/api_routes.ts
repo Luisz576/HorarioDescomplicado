@@ -5,16 +5,21 @@ import projectControllerFactory from '../factory/controller/project_controller_f
 
 const routes = Router()
 
-// const authenticator_middleware = authenticatorMiddlewareFactory()
-// routes.use((req, res, next) => {
-//     const adapter = new ExpressAdapter(req, res, next)
-//     return authenticator_middleware.auth(adapter)
-// })
+const authenticator_middleware = authenticatorMiddlewareFactory()
+routes.use((req, res, next) => {
+    const adapter = new ExpressAdapter(req, res, next)
+    return authenticator_middleware.auth(adapter)
+})
 
 const projectController = projectControllerFactory()
 routes.post('/project', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return projectController.create(adapter)
+})
+
+routes.delete('/project', (req, res, next) => {
+  const adapter = new ExpressAdapter(req, res, next)
+  return projectController.delete(adapter)
 })
 
 export default routes

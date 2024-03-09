@@ -18,8 +18,30 @@ class ProjectRepository implements IProjectRepository{
       return left("couldn't create project: " + e)
     }
   }
-  delete(): Promise<Either<any, Boolean>> {
-    throw new Error("Method not implemented.");
+  async update(targetId: number, data: Partial<IProject>): Promise<Either<any, Boolean>> {
+    try{
+      await prisma.project.update({
+        data: data,
+        where: {
+          id: targetId
+        }
+      })
+      return right(true)
+    }catch(e){
+      return left("couldn't update project: " + e)
+    }
+  }
+  async delete(targetId: number): Promise<Either<any, Boolean>>{
+    try{
+      await prisma.project.delete({
+        where: {
+          id: targetId
+        }
+      })
+      return right(true)
+    }catch(e){
+      return left("couldn't update project: " + e)
+    }
   }
 }
 

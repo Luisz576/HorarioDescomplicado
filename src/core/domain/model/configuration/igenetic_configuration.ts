@@ -1,12 +1,12 @@
-export type TrainingMethod = "RANK" | "ROULETTE" | "COMPETITION"
+export type SelectionMethod = "RANK" | "ROULETTE" | "COMPETITION"
 export type StopMethod = "MAX_GENERATIONS" | "GENERATIONS_WITHOUT_BETTER_SCORE"
 
 export default interface IGeneticConfiguration{
-  id: string
+  id: number
   populationSize: number
-  eliteSize: number
+  rankSlice: number
   randomIndividualSize: number
   mutationRate: number
-  trainingMethod: TrainingMethod
+  selectionMethod: SelectionMethod
   stopMethod: StopMethod
 }

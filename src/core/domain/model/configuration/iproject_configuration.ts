@@ -1,5 +1,5 @@
 export default interface IProjectConfiguration{
-  id: string
+  id: number
   preferFirstClasses: boolean
-  geneticConfigurationId: string
+  geneticConfigurationId: number
 }

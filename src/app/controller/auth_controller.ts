@@ -11,6 +11,8 @@ export default class AuthController{
               status: 200,
               token
           })
+      }else{
+        return context.getResponse().sendStatus(401)
       }
     }
     return context.getResponse().sendStatus(400)

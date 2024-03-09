@@ -22,10 +22,10 @@ class ConfigurationRepository implements IConfigurationRepository{
       return right({
         id: res.id,
         populationSize: res.populationSize,
-        eliteSize: res.eliteSize,
+        rankSlice: res.rankSlice,
         randomIndividualSize: res.randomIndividualSize,
         mutationRate: res.mutationRate.toNumber(),
-        trainingMethod: res.trainingMethod,
+        selectionMethod: res.selectionMethod,
         stopMethod: res.stopMethod
       })
     }catch(e){

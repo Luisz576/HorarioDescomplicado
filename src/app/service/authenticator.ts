@@ -40,7 +40,6 @@ export default {
     if(!user){
       return undefined
     }
-    const expires: number = expiresIn ? expiresIn : DEFAULT_TOKEN_TIME
     let client
     for(let i in auth_configs.clients){
       if(auth_configs.clients[i].id == user.client_id){
@@ -50,6 +49,7 @@ export default {
     if(!client){
       return undefined
     }
+    const expires: number = expiresIn ? expiresIn : DEFAULT_TOKEN_TIME
     const generated_token = `${client.id}${splitMarker}${this.generateJWTToken({ secret: client.secret }, expires)}`
     return generated_token
   },

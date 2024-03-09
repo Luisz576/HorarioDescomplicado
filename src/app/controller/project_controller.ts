@@ -1,5 +1,6 @@
 import IHttpContext from "../../core/domain/http/ihttp_context";
 import createProject from "../usecase/project/create_project";
+import deleteProject from "../usecase/project/delete_project";
 
 export default class ProjectController{
   async create(context: IHttpContext){
@@ -13,7 +14,16 @@ export default class ProjectController{
         data: res.value
       })
     }
-    console.log(res)
+    return context.getResponse().sendStatus(400)
+  }
+  async delete(context: IHttpContext){
+    const { targetId } = context.getRequest().body
+    const res = await deleteProject.exec(targetId)
+    if(res.isRight()){
+      return context.getResponse().json({
+        status: 200
+      })
+    }
     return context.getResponse().sendStatus(400)
   }
 }

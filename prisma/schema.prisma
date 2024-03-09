@@ -18,70 +18,70 @@ enum DayOfWeek {
 }
 
 model Time {
-  id         String    @id @default(uuid())
+  id         Int       @id @default(autoincrement())
   day        DayOfWeek
   startTime  String
   endTime    String
   Schedules  Schedule  @relation(fields: [scheduleId], references: [id])
-  scheduleId String
+  scheduleId Int
 }
 
 model Schedule {
-  id        String      @id @default(uuid())
+  id        Int         @id @default(autoincrement())
   schedule  Time[]
   Teacher   Teacher[]
   Classroom Classroom[]
 }
 
 model Teacher {
-  id         String    @id @default(uuid())
+  id         Int       @id @default(autoincrement())
   name       String
   schedule   Schedule  @relation(fields: [scheduleId], references: [id])
-  scheduleId String
+  scheduleId Int
   Project    Project   @relation(fields: [projectId], references: [id])
-  projectId  String
+  projectId  Int
   Subject    Subject[]
 }
 
 model Subject {
-  id                     String               @id @default(uuid())
+  id                     Int                  @id @default(autoincrement())
   name                   String
   classes                Int                  @default(1)
   configuration          SubjectConfiguration @relation(fields: [subjectConfigurationId], references: [id])
+  subjectConfigurationId Int
   teacher                Teacher              @relation(fields: [teacherId], references: [id])
-  teacherId              String
-  subjectConfigurationId String
+  teacherId              Int
   Classroom              Classroom            @relation(fields: [classroomId], references: [id])
-  classroomId            String
+  classroomId            Int
 }
 
 model Classroom {
-  id         String    @id @default(uuid())
+  id         Int       @id @default(autoincrement())
   name       String
   schedule   Schedule  @relation(fields: [scheduleId], references: [id])
-  scheduleId String
+  scheduleId Int
   Project    Project   @relation(fields: [projectId], references: [id])
-  projectId  String
+  projectId  Int
   subjects   Subject[]
 }
 
 model Project {
-  id              String        @id @default(uuid())
+  id              Int           @id @default(autoincrement())
   name            String        @unique
   classrooms      Classroom[]
   teachers        Teacher[]
   configuration   Configuration @relation(fields: [configurationId], references: [id])
-  configurationId String
+  configurationId Int
 
   @@index([name])
 }
 
 model Configuration {
-  id                     String               @id @default(uuid())
+  id                     Int                  @id @default(autoincrement())
   Project                Project[]
   preferFirstClasses     Boolean              @default(true)
   geneticConfiguration   GeneticConfiguration @relation(fields: [geneticConfigurationId], references: [id])
-  geneticConfigurationId String
+  geneticConfigurationId Int
 }
 
 enum SelectionMethod {
@@ -96,7 +96,7 @@ enum StopMethod {
 }
 
 model GeneticConfiguration {
-  id                   String          @id @default(uuid())
+  id                   Int             @id @default(autoincrement())
   Configuration        Configuration[]
   populationSize       Int             @default(100)
   rankSlice            Int             @default(3)
@@ -107,7 +107,7 @@ model GeneticConfiguration {
 }
 
 model SubjectConfiguration {
-  id                          String    @id @default(uuid())
+  id                          Int       @id @default(autoincrement())
   minConsecutiveClasses       Int       @default(2)
   maxConsecutiveClasses       Int       @default(4)
   preferMaxConsecutiveClasses Boolean   @default(false)

@@ -37,7 +37,6 @@ export default class AuthenticateToken{
                 }
                 return data.callback(right(false))
             })
-            return data.callback(right(false))
         }catch(err){
             return data.callback(left(err))
         }
