@@ -16,7 +16,6 @@ routes.post('/project', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return projectController.create(adapter)
 })
-
 routes.delete('/project', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return projectController.delete(adapter)

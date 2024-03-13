@@ -103,6 +103,7 @@ model GeneticConfiguration {
   rankSlice            Int             @default(3)
   randomIndividualSize Int             @default(1)
   mutationRate         Decimal         @default(0.1)
+  roundsOfRoulette     Int             @default(1)
   selectionMethod      SelectionMethod @default(COMPETITION)
   stopMethod           StopMethod      @default(GENERATIONS_WITHOUT_BETTER_SCORE)
 }

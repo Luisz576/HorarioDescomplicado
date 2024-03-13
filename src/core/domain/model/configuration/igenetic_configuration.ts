@@ -7,6 +7,7 @@ export default interface IGeneticConfiguration{
   rankSlice: number
   randomIndividualSize: number
   mutationRate: number
+  roundsOfRoulette: number
   selectionMethod: SelectionMethod
   stopMethod: StopMethod
 }

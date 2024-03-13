@@ -91,6 +91,7 @@ class ConfigurationRepository implements IConfigurationRepository{
         populationSize: gc.populationSize,
         randomIndividualSize: gc.randomIndividualSize,
         rankSlice: gc.rankSlice,
+        roundsOfRoulette: gc.roundsOfRoulette,
         selectionMethod: gc.selectionMethod,
         stopMethod: gc.stopMethod
       })
