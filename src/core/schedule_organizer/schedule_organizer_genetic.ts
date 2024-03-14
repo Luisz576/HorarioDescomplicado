@@ -82,7 +82,7 @@ export default class ScheduleOrganizerGenetic{
     let randomClass = randomInt(phenotype.classrooms.length)
     let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
     let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
-    let p = this.#phenotypeProps.subjects[randomInt(this.#phenotypeProps.subjects.length)]
+    let p = this.#phenotypeProps.subjects[getAcceptableSubject(this.#phenotypeProps, randomClass)]
     phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = p
     return phenotype
   }
@@ -108,17 +108,32 @@ export default class ScheduleOrganizerGenetic{
     return initialPopulation
   }
 
+  config(): GeneticConfiguration{
+    return this.#g.config()
+  }
+
+  /*
+  Penalidade:
+  - Aula vazia: -A
+  - Prof em mais de uma aula na mesma hora: -B
+  - Matéria com mais aula seguida que a max: -C
+  - Matéria prefere max aula seguida mas não está: -D
+  - Matéria sem todas as classes: -E * nAulasFaltantes
+  - Matéria com menos aulas do que o min class: -F
+
+  Recompensa:
+  - Prof prefere max aula seguida e esta: +G
+  - Matérias com numero correto de aulas: +H
+  - Dia com horários okays: +I
+  - Dia sem aula: +J
+  */
   #fitness(phenotype: ScheduleOrganizerPhenotype): number{
     let score = 0
 
-    for(){
-      // ver se passou do max de aula daquela aula
-    }
+    // for(){
+    //   // ver se passou do max de aula daquela aula
+    // }
 
     return score
-  }
-
-  config(): GeneticConfiguration{
-    return this.#g.config()
   }
 }
