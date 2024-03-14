@@ -2,7 +2,7 @@ import IGenetic from "./igenetic";
 import SelectionMethod from "./selection_method";
 import { cloneJson, randomInt } from './utils'
 
-interface GeneticConfiguration{
+export interface GeneticConfiguration{
   populationSize: number
   randomIndividualSize: number
   mutationRate: number
@@ -11,7 +11,7 @@ interface GeneticConfiguration{
   roundsOfRoulette: number
 }
 
-interface GeneticMethods<Phenotype>{
+export interface GeneticMethods<Phenotype>{
   doesABeatB?: (phenotypeA: Phenotype, phenotypeB: Phenotype) => boolean
   mutatePhenotype: (phenotype: Phenotype) => Phenotype
   crossover: (phenotypeA: Phenotype, phenotypeB: Phenotype) => Phenotype

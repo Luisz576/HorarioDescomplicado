@@ -8,6 +8,7 @@ export default interface IGeneticConfiguration{
   randomIndividualSize: number
   mutationRate: number
   roundsOfRoulette: number
+  maxOrWithoutBetterGenerations: number
   selectionMethod: SelectionMethod
   stopMethod: StopMethod
 }

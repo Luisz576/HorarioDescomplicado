@@ -17,27 +17,28 @@ enum DayOfWeek {
   SATURDAY
 }
 
-model Time {
-  id         Int       @id @default(autoincrement())
-  day        DayOfWeek
-  startTime  String
-  endTime    String
-  Schedules  Schedule  @relation(fields: [scheduleId], references: [id])
-  scheduleId Int
-}
+// model Time {
+//   id         Int       @id @default(autoincrement())
+//   day        DayOfWeek
+//   startTime  Int
+//   endTime    Int
+//   Schedules  Schedule  @relation(fields: [scheduleId], references: [id])
+//   scheduleId Int
+// }
 
-model Schedule {
-  id        Int         @id @default(autoincrement())
-  schedule  Time[]
-  Teacher   Teacher[]
-  Classroom Classroom[]
-}
+// model Schedule {
+//   id        Int         @id @default(autoincrement())
+//   duration  Int         @default(5)
+//   schedule  Time[]
+//   Teacher   Teacher[]
+//   Classroom Classroom[]
+// }
 
 model Teacher {
   id         Int       @id @default(autoincrement())
   name       String
-  schedule   Schedule  @relation(fields: [scheduleId], references: [id])
-  scheduleId Int
+  // schedule   Schedule  @relation(fields: [scheduleId], references: [id])
+  // scheduleId Int
   Project    Project   @relation(fields: [projectId], references: [id])
   projectId  Int
   Subject    Subject[]
@@ -58,8 +59,8 @@ model Subject {
 model Classroom {
   id         Int       @id @default(autoincrement())
   name       String
-  schedule   Schedule  @relation(fields: [scheduleId], references: [id])
-  scheduleId Int
+  // schedule   Schedule  @relation(fields: [scheduleId], references: [id])
+  // scheduleId Int
   Project    Project   @relation(fields: [projectId], references: [id])
   projectId  Int
   subjects   Subject[]
@@ -97,15 +98,16 @@ enum StopMethod {
 }
 
 model GeneticConfiguration {
-  id                   Int             @id @default(autoincrement())
-  Configuration        Configuration[]
-  populationSize       Int             @default(100)
-  rankSlice            Int             @default(3)
-  randomIndividualSize Int             @default(1)
-  mutationRate         Decimal         @default(0.1)
-  roundsOfRoulette     Int             @default(1)
-  selectionMethod      SelectionMethod @default(COMPETITION)
-  stopMethod           StopMethod      @default(GENERATIONS_WITHOUT_BETTER_SCORE)
+  id                            Int             @id @default(autoincrement())
+  Configuration                 Configuration[]
+  populationSize                Int             @default(100)
+  rankSlice                     Int             @default(3)
+  randomIndividualSize          Int             @default(1)
+  mutationRate                  Decimal         @default(0.1)
+  roundsOfRoulette              Int             @default(1)
+  maxOrWithoutBetterGenerations Int             @default(1)
+  selectionMethod               SelectionMethod @default(COMPETITION)
+  stopMethod                    StopMethod      @default(GENERATIONS_WITHOUT_BETTER_SCORE)
 }
 
 model SubjectConfiguration {
