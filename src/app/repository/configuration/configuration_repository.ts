@@ -26,7 +26,9 @@ class ConfigurationRepository implements IConfigurationRepository{
         randomIndividualSize: res.randomIndividualSize,
         mutationRate: res.mutationRate.toNumber(),
         selectionMethod: res.selectionMethod,
-        stopMethod: res.stopMethod
+        stopMethod: res.stopMethod,
+        maxOrWithoutBetterGenerations: res.maxOrWithoutBetterGenerations,
+        roundsOfRoulette: res.roundsOfRoulette
       })
     }catch(e){
       return left("Couldn't create genetic configuration: " + e)
@@ -93,7 +95,8 @@ class ConfigurationRepository implements IConfigurationRepository{
         rankSlice: gc.rankSlice,
         roundsOfRoulette: gc.roundsOfRoulette,
         selectionMethod: gc.selectionMethod,
-        stopMethod: gc.stopMethod
+        stopMethod: gc.stopMethod,
+        maxOrWithoutBetterGenerations: gc.maxOrWithoutBetterGenerations
       })
     }catch(e){
       return left(e)

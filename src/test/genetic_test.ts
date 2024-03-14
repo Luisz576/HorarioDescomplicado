@@ -74,8 +74,8 @@ async function run(){
     rankSlice: 1,
     roundsOfRoulette: 1,
     selectionMethod: 'COMPETITION',
-    stopMethod: 'MAX_GENERATIONS',
-    maxOrWithoutBetterGenerations: 100,
+    stopMethod: 'GENERATIONS_WITHOUT_BETTER_SCORE',
+    maxOrWithoutBetterGenerations: 10,
   })
 
   await g.evolve()

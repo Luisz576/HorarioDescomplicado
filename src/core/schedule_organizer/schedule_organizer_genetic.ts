@@ -38,7 +38,7 @@ export function getSubjectById(subjects: BaseSubject[], subjectId: number): Base
 }
 
 export function getAcceptableSubjectId(pProps: ScheduleOrganizerProps, classId: number, canBeEmpty = true, maxIter = -1): number{
-  if(canBeEmpty && Math.random() < 0.05){
+  if(canBeEmpty && Math.random() < 0.2){
     return -1
   }
 
@@ -130,7 +130,7 @@ export default class ScheduleOrganizerGenetic{
     let randomClass = randomInt(phenotype.classrooms.length)
     let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
     let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
-    let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass)
+    let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass, true)
     phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
       id: sId
     }
@@ -183,7 +183,7 @@ export default class ScheduleOrganizerGenetic{
   }
   async evolve(){
     while(!this.#reachedTheStopMethod()){
-      console.warn(this.#currentGeneration)
+      console.warn('generation:',this.#currentGeneration)
       this.#g.evolve()
 
       let bestPhenotypeScore = this.#g.bestPhenotypesScores(1)
@@ -220,13 +220,18 @@ export default class ScheduleOrganizerGenetic{
     let metaPhenotype: any = {
       classrooms: {},
       teachers: [],
+      subjects: {
+        ids: []
+      },
       day: {
         size: 0
       }
     }
     // build meta
     for(let c = 0; c < phenotype.classrooms.length; c++){
-      metaPhenotype.classrooms[`${c}`] = {}
+      metaPhenotype.classrooms[`${c}`] = {
+        subjects: {}
+      }
       for(let d = 0; d < phenotype.classrooms[c].days.length; d++){
         metaPhenotype.classrooms[`${c}`][`${d}`] = {}
 
@@ -250,6 +255,16 @@ export default class ScheduleOrganizerGenetic{
             // REGRA: - Aula vazia
             score -= PONTUATION.emptyClassPenality
           }else{
+            if(!(metaPhenotype.subjects.ids.includes(sId))){
+              metaPhenotype.subjects.ids.push([sId])
+            }
+
+            // salva quantidade total por classe
+            if(!(`${sId}` in metaPhenotype.classrooms[`${c}`].subjects)){
+              metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] = 0
+            }
+            metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] += 1
+
             // salva quantidade de aulas no dia
             if(`${sId}` in metaPhenotype.classrooms[`${c}`][`${d}`]){
               metaPhenotype.classrooms[`${c}`][`${d}`][`${sId}`] += 1
@@ -284,11 +299,31 @@ export default class ScheduleOrganizerGenetic{
         }
       }
     }
+    // subjects score
+    for(let s = 0; s < metaPhenotype.subjects.ids.length; s++){
+      let sId = metaPhenotype.subjects.ids[s]
+      for(let c = 0; c < phenotype.classrooms.length; c++){
+        let sClasses = -1
+        for(let ac = 0; ac < this.#phenotypeProps.classrooms[`${c}`].acceptedSubjects.length; ac++){
+          if(this.#phenotypeProps.classrooms[`${c}`].acceptedSubjects[ac].subjectId){
+            sClasses = this.#phenotypeProps.classrooms[`${c}`].acceptedSubjects[ac].classes
+          }
+        }
+
+        if(sClasses != -1 &&
+            (metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] < sClasses ||
+            metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] > sClasses)
+          ){
+            let dif = Math.abs(metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] - sClasses)
+            // Regra: Matéria sem todas as classes: -E * nAulasFaltantes
+            score -= dif * PONTUATION.differentAmountOfClassesPenality
+        }
+      }
+    }
 
     // TODO:
     // - Matéria com mais aula seguida que a max: -C * nAulasAMais
     // - Matéria prefere max aula seguida mas não está: -D
-    // - Matéria sem todas as classes: -E * nAulasFaltantes
     // - Matéria com menos aulas do que o min class: -F
 
     // - Prof prefere max aula seguida e esta: +G
