@@ -315,7 +315,7 @@ export default class ScheduleOrganizerGenetic{
             metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] > sClasses)
           ){
             let dif = Math.abs(metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] - sClasses)
-            // Regra: Matéria sem todas as classes: -E * nAulasFaltantes
+            // Regra: Matéria sem as aulas certinho: -E * nAulasFaltantes
             score -= dif * PONTUATION.differentAmountOfClassesPenality
         }
       }
