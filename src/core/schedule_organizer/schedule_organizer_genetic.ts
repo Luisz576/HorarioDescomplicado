@@ -5,40 +5,59 @@ import scheduleOrganizerPhenotypeInitializer from "./phenotype_initializer"
 import { DayOfWeek } from "../utils/utils"
 import ISubjectConfiguration from "../domain/model/configuration/isubject_configuration"
 import randomInt from "../utils/random_int"
+import cloneJson from "../utils/clone_json"
+import PONTUATION from "./pontuation"
 
+export interface BaseSubject{
+  id: number
+  teacherId: number
+  configuration: ISubjectConfiguration
+}
 export interface ScheduleOrganizerProps{
   classrooms: {
-    days: {
-      dayOfWeek: DayOfWeek
-      // schedule: Time[]
-    }[],
-    acceptedSubjects: number[]
+    days: DayOfWeek[],
+    acceptedSubjects: {
+      subjectId: number
+      classes: number
+    }[]
   }[],
   teachers: {
     id: number
     // schedule: Time[]
   }[]
-  subjects: {
-    id: number
-    teacherId: number
-    classes: number
-    configuration: ISubjectConfiguration
-  }[]
+  subjects: BaseSubject[]
 }
 
-export function getAcceptableSubject(pProps: ScheduleOrganizerProps, classId: number, canBeEmpty = true): number{
+export function getSubjectById(subjects: BaseSubject[], subjectId: number): BaseSubject | undefined{
+  for(let i = 0; i < subjects.length; i++){
+    if(subjects[i].id == subjectId){
+      return subjects[i]
+    }
+  }
+  return undefined
+}
+
+export function getAcceptableSubjectId(pProps: ScheduleOrganizerProps, classId: number, canBeEmpty = true, maxIter = -1): number{
   if(canBeEmpty && Math.random() < 0.05){
     return -1
   }
+
+  let acceptables = []
+  for(let a = 0; a < pProps.classrooms[classId].acceptedSubjects.length; a++){
+    acceptables.push(pProps.classrooms[classId].acceptedSubjects[a].subjectId)
+  }
+
   let i = 0
-  let randSubjectIndex = -1
-  let maxIter = pProps.subjects.length * 2
-  while(!pProps.classrooms[classId].acceptedSubjects.includes(randSubjectIndex) && i < maxIter){
-    randSubjectIndex = randomInt(pProps.subjects.length)
+  let randSubjectId = -1
+  if(maxIter < 0){
+    maxIter = pProps.subjects.length * 2
+  }
+  while(!acceptables.includes(randSubjectId) && i < maxIter){
+    randSubjectId = pProps.subjects[randomInt(pProps.subjects.length)].id
     i++
   }
-  if(pProps.classrooms[classId].acceptedSubjects.includes(randSubjectIndex)){
-    return randSubjectIndex
+  if(acceptables.includes(randSubjectId)){
+    return randSubjectId
   }
   return -1
 }
@@ -46,9 +65,34 @@ export function getAcceptableSubject(pProps: ScheduleOrganizerProps, classId: nu
 export default class ScheduleOrganizerGenetic{
   #g: Genetic<ScheduleOrganizerPhenotype>
   #phenotypeProps: ScheduleOrganizerProps
+  #teacherMeta: any
+
   #stopMethod: StopMethod
+  #maxOrWithoutBetterGenerations: number
+
+  #currentGeneration: number = 1
+  #generationsWithoutBetter: number = 0
+  #bestPhenotypeScore: number = Number.NEGATIVE_INFINITY
+
+  #bestPhenotype: ScheduleOrganizerPhenotype | undefined
+
+  #buildTeacherMeta(): {}{
+    let t: any = {}
+    for(let i = 0; i < this.#phenotypeProps.subjects.length; i++){
+      let s = this.#phenotypeProps.subjects[i]
+      if(!(s.teacherId in t)){
+        t[`${s.teacherId}`] = []
+      }
+      t[`${s.teacherId}`].push(s.id)
+    }
+    return t
+  }
+
   constructor(phenotypeProps: ScheduleOrganizerProps, geneticConfiguration: Omit<IGeneticConfiguration, 'id'>){
     this.#phenotypeProps = phenotypeProps
+    this.#stopMethod = geneticConfiguration.stopMethod
+    this.#maxOrWithoutBetterGenerations = geneticConfiguration.maxOrWithoutBetterGenerations
+    this.#teacherMeta = this.#buildTeacherMeta()
     this.#g = new Genetic<ScheduleOrganizerPhenotype>({
       mutationRate: geneticConfiguration.mutationRate,
       populationSize: geneticConfiguration.populationSize,
@@ -56,12 +100,11 @@ export default class ScheduleOrganizerGenetic{
       rankSlice: geneticConfiguration.rankSlice,
       selectionMethod: geneticConfiguration.selectionMethod
     }, {
-      crossover: this.#crossover,
-      fitness: this.#fitness,
-      mutatePhenotype: this.#mutatePhenotype,
-      doesABeatB: this.#doesABeatB,
-    }, this.#createInitialPopulation())
-    this.#stopMethod = geneticConfiguration.stopMethod
+      crossover: this.#crossover.bind(this),
+      fitness: this.#fitness.bind(this),
+      mutatePhenotype: this.#mutatePhenotype.bind(this),
+      doesABeatB: this.#doesABeatB.bind(this),
+    }, this.#createInitialPopulation(geneticConfiguration))
   }
 
   #crossover(phenotypeA: ScheduleOrganizerPhenotype, phenotypeB: ScheduleOrganizerPhenotype){
@@ -77,6 +120,9 @@ export default class ScheduleOrganizerGenetic{
     let randomDay = randomInt(x.classrooms[randomClass].days.length)
     let randomSubject = randomInt(x.classrooms[randomClass].days[randomDay].subjects.length)
     x.classrooms[randomClass].days[randomDay].subjects[randomSubject] = y.classrooms[randomClass].days[randomDay].subjects[randomSubject]
+    if(Math.random() < this.#g.config().mutationRate){
+      x = this.#mutatePhenotype(x)
+    }
     return x
   }
 
@@ -84,8 +130,10 @@ export default class ScheduleOrganizerGenetic{
     let randomClass = randomInt(phenotype.classrooms.length)
     let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
     let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
-    let p = this.#phenotypeProps.subjects[getAcceptableSubject(this.#phenotypeProps, randomClass)]
-    phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = p
+    let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass)
+    phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
+      id: sId
+    }
     return phenotype
   }
 
@@ -101,9 +149,9 @@ export default class ScheduleOrganizerGenetic{
     return false
   }
 
-  #createInitialPopulation(): ScheduleOrganizerPhenotype[]{
+  #createInitialPopulation(config: GeneticConfiguration): ScheduleOrganizerPhenotype[]{
     let initialPopulation: ScheduleOrganizerPhenotype[] = []
-    let popSize = this.#g.config().populationSize
+    let popSize = config.populationSize
     for(let i = 0; i < popSize; i++){
       initialPopulation.push(scheduleOrganizerPhenotypeInitializer(this.#phenotypeProps))
     }
@@ -114,22 +162,46 @@ export default class ScheduleOrganizerGenetic{
     return this.#g.config()
   }
 
+  currentGeneration(): number{
+    return this.#currentGeneration
+  }
+
   phenotypes(): ScheduleOrganizerPhenotype[]{
     return this.#g.population()
   }
 
-  #reachedTheStopMethod(): boolean{
-    return false
+  bestPhenotype(): ScheduleOrganizerPhenotype | undefined{
+    return this.#bestPhenotype
   }
-  async init(){
+
+  #reachedTheStopMethod(): boolean{
+    if(this.#stopMethod == 'MAX_GENERATIONS'){
+      return this.#currentGeneration >= this.#maxOrWithoutBetterGenerations
+    }else{
+      return this.#generationsWithoutBetter >= this.#maxOrWithoutBetterGenerations
+    }
+  }
+  async evolve(){
     while(!this.#reachedTheStopMethod()){
-      // TODO:
+      console.warn(this.#currentGeneration)
+      this.#g.evolve()
+
+      let bestPhenotypeScore = this.#g.bestPhenotypesScores(1)
+      if(bestPhenotypeScore[0].score > this.#bestPhenotypeScore){
+        this.#bestPhenotypeScore = bestPhenotypeScore[0].score
+        this.#bestPhenotype = cloneJson(bestPhenotypeScore[0].phenotype)
+        this.#generationsWithoutBetter = 0
+      }else{
+        this.#generationsWithoutBetter++
+      }
+
+      this.#currentGeneration++
     }
   }
 
   /*
   Penalidade:
-  - Aula vazia: -A
+  - Aula vazia: -1
   - Prof em mais de uma aula na mesma hora: -B
   - Matéria com mais aula seguida que a max: -C
   - Matéria prefere max aula seguida mas não está: -D
@@ -145,10 +217,83 @@ export default class ScheduleOrganizerGenetic{
   #fitness(phenotype: ScheduleOrganizerPhenotype): number{
     let score = 0
 
-    // for(){
-    //   // ver se passou do max de aula daquela aula
-    // }
+    let metaPhenotype: any = {
+      classrooms: {},
+      teachers: [],
+      day: {
+        size: 0
+      }
+    }
+    // build meta
+    for(let c = 0; c < phenotype.classrooms.length; c++){
+      metaPhenotype.classrooms[`${c}`] = {}
+      for(let d = 0; d < phenotype.classrooms[c].days.length; d++){
+        metaPhenotype.classrooms[`${c}`][`${d}`] = {}
 
+        if(!(`${d}` in metaPhenotype.day)){
+          metaPhenotype.day[`${d}`] = {
+            subjectsBlocks: {
+              size: 0
+            }
+          }
+          metaPhenotype.day.size += 1
+        }
+
+        for(let s = 0; s < phenotype.classrooms[c].days[d].subjects.length; s++){
+          if(!(`${s}` in metaPhenotype.day[`${d}`].subjectsBlocks)){
+            metaPhenotype.day[`${d}`].subjectsBlocks[`${s}`] = []
+            metaPhenotype.day[`${d}`].subjectsBlocks.size += 1
+          }
+
+          let sId = phenotype.classrooms[c].days[d].subjects[s].id
+          if(sId == -1){
+            // REGRA: - Aula vazia
+            score -= PONTUATION.emptyClassPenality
+          }else{
+            // salva quantidade de aulas no dia
+            if(`${sId}` in metaPhenotype.classrooms[`${c}`][`${d}`]){
+              metaPhenotype.classrooms[`${c}`][`${d}`][`${sId}`] += 1
+            }else{
+              metaPhenotype.classrooms[`${c}`][`${d}`][`${sId}`] = 1
+            }
+            metaPhenotype.day[`${d}`].subjectsBlocks[`${s}`].push(sId)
+          }
+        }
+      }
+    }
+
+    // teacherScore
+    for(let t = 0; t < this.#phenotypeProps.teachers.length; t++){
+      let tId = this.#phenotypeProps.teachers[t].id
+
+      for(let d = 0; d < metaPhenotype.day.size; d++){
+        for(let s = 0; s < metaPhenotype.day[`${d}`].subjectsBlocks.size; s++){
+          let classesAtSameTime = 0
+
+          // pega bloco do dia por bloco do dia
+          let subjectsBlock = metaPhenotype.day[`${d}`].subjectsBlocks[s]
+          for(let sb = 0; sb < subjectsBlock.length; sb++){
+            let sId = subjectsBlock[sb]
+            if(this.#teacherMeta[`${tId}`].includes(sId)){
+              classesAtSameTime += 1
+            }
+          }
+
+          // REGRA: - Prof em mais de uma aula na mesma hora
+          score -= (Math.max(classesAtSameTime - 1, 0)) * PONTUATION.classesAtSameTimePenality
+        }
+      }
+    }
+
+    // TODO:
+    // - Matéria com mais aula seguida que a max: -C * nAulasAMais
+    // - Matéria prefere max aula seguida mas não está: -D
+    // - Matéria sem todas as classes: -E * nAulasFaltantes
+    // - Matéria com menos aulas do que o min class: -F
+
+    // - Prof prefere max aula seguida e esta: +G
+    // - Matérias com numero correto de aulas: +H
+    // - Dia sem aula: +J
     return score
   }
 }

@@ -9,7 +9,6 @@ export interface Day{
 
 export interface Classroom{
   days: Day[]
-  acceptedSubjects: number[]
 }
 
 export default interface ScheduleOrganizerPhenotype{

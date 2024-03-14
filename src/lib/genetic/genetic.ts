@@ -117,7 +117,7 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
         if(this.#doesABeatBFunction(phenotype, competitor)){
           nextGeneration.push(phenotype)
         }else{
-            nextGeneration.push(competitor)
+          nextGeneration.push(competitor)
         }
     }
 
@@ -231,6 +231,10 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
     return this
   }
   bestPhenotypes(n?: number | undefined): Phenotype[] {
+    return this.bestPhenotypesScores(n)
+              .map((s) => s.phenotype)
+  }
+  bestPhenotypesScores(n?: number | undefined): {score: number, phenotype: Phenotype}[] {
     if(!n){
       n = 1
     }
@@ -240,7 +244,6 @@ export default class Genetic<Phenotype> implements IGenetic<Phenotype>{
       throw new Error("'n' must be grater or equal than 0")
     }
     return this.scores(true)
-              .map((s) => s.phenotype)
               .slice(0, n)
   }
   scores(ranked?: boolean): {score: number, phenotype: Phenotype}[] {

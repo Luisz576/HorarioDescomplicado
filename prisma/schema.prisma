@@ -35,35 +35,43 @@ enum DayOfWeek {
 // }
 
 model Teacher {
-  id         Int       @id @default(autoincrement())
-  name       String
+  id        Int       @id @default(autoincrement())
+  name      String
   // schedule   Schedule  @relation(fields: [scheduleId], references: [id])
   // scheduleId Int
-  Project    Project   @relation(fields: [projectId], references: [id])
-  projectId  Int
-  Subject    Subject[]
+  Project   Project   @relation(fields: [projectId], references: [id])
+  projectId Int
+  Subject   Subject[]
 }
 
 model Subject {
   id                     Int                  @id @default(autoincrement())
   name                   String
-  classes                Int                  @default(1)
   configuration          SubjectConfiguration @relation(fields: [subjectConfigurationId], references: [id])
   subjectConfigurationId Int
   teacher                Teacher              @relation(fields: [teacherId], references: [id])
   teacherId              Int
-  Classroom              Classroom            @relation(fields: [classroomId], references: [id])
-  classroomId            Int
+  ClassroomSubject       ClassroomSubject[]
+  classroomId            Int?
+}
+
+model ClassroomSubject {
+  id          Int       @id @default(autoincrement())
+  classes     Int       @default(1)
+  subject     Subject   @relation(fields: [subjectId], references: [id])
+  classroom   Classroom @relation(fields: [classroomId], references: [id])
+  subjectId   Int
+  classroomId Int
 }
 
 model Classroom {
-  id         Int       @id @default(autoincrement())
-  name       String
+  id               Int                @id @default(autoincrement())
+  name             String
   // schedule   Schedule  @relation(fields: [scheduleId], references: [id])
   // scheduleId Int
-  Project    Project   @relation(fields: [projectId], references: [id])
-  projectId  Int
-  subjects   Subject[]
+  Project          Project            @relation(fields: [projectId], references: [id])
+  projectId        Int
+  ClassroomSubject ClassroomSubject[]
 }
 
 model Project {
