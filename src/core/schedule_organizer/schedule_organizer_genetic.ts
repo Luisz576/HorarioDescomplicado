@@ -1,5 +1,5 @@
 import Genetic, { GeneticConfiguration } from "../../lib/genetic/genetic"
-import IGeneticConfiguration from "../domain/model/configuration/igenetic_configuration"
+import IGeneticConfiguration, { StopMethod } from "../domain/model/configuration/igenetic_configuration"
 import ScheduleOrganizerPhenotype from "./phenotype"
 import scheduleOrganizerPhenotypeInitializer from "./phenotype_initializer"
 import { DayOfWeek } from "../utils/utils"
@@ -46,6 +46,7 @@ export function getAcceptableSubject(pProps: ScheduleOrganizerProps, classId: nu
 export default class ScheduleOrganizerGenetic{
   #g: Genetic<ScheduleOrganizerPhenotype>
   #phenotypeProps: ScheduleOrganizerProps
+  #stopMethod: StopMethod
   constructor(phenotypeProps: ScheduleOrganizerProps, geneticConfiguration: Omit<IGeneticConfiguration, 'id'>){
     this.#phenotypeProps = phenotypeProps
     this.#g = new Genetic<ScheduleOrganizerPhenotype>({
@@ -60,6 +61,7 @@ export default class ScheduleOrganizerGenetic{
       mutatePhenotype: this.#mutatePhenotype,
       doesABeatB: this.#doesABeatB,
     }, this.#createInitialPopulation())
+    this.#stopMethod = geneticConfiguration.stopMethod
   }
 
   #crossover(phenotypeA: ScheduleOrganizerPhenotype, phenotypeB: ScheduleOrganizerPhenotype){
@@ -110,6 +112,19 @@ export default class ScheduleOrganizerGenetic{
 
   config(): GeneticConfiguration{
     return this.#g.config()
+  }
+
+  phenotypes(): ScheduleOrganizerPhenotype[]{
+    return this.#g.population()
+  }
+
+  #reachedTheStopMethod(): boolean{
+    return false
+  }
+  async init(){
+    while(!this.#reachedTheStopMethod()){
+      // TODO:
+    }
   }
 
   /*
