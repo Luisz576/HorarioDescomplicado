@@ -7,6 +7,7 @@ import ISubjectConfiguration from "../domain/model/configuration/isubject_config
 import randomInt from "../utils/random_int"
 import cloneJson from "../utils/clone_json"
 import PONTUATION from "./pontuation"
+import metaScheduleOrganizerPhenotypeBuilder from "./meta_phenotype_builder"
 
 export interface BaseSubject{
   id: number
@@ -26,15 +27,6 @@ export interface ScheduleOrganizerProps{
     // schedule: Time[]
   }[]
   subjects: BaseSubject[]
-}
-
-export function getSubjectById(subjects: BaseSubject[], subjectId: number): BaseSubject | undefined{
-  for(let i = 0; i < subjects.length; i++){
-    if(subjects[i].id == subjectId){
-      return subjects[i]
-    }
-  }
-  return undefined
 }
 
 export function getAcceptableSubjectId(pProps: ScheduleOrganizerProps, classId: number, canBeEmpty = true, maxIter = -1): number{
@@ -217,109 +209,112 @@ export default class ScheduleOrganizerGenetic{
   #fitness(phenotype: ScheduleOrganizerPhenotype): number{
     let score = 0
 
-    let metaPhenotype: any = {
-      classrooms: {},
-      teachers: [],
-      subjects: {
-        ids: []
-      },
-      day: {
-        size: 0
-      }
-    }
-    // build meta
-    for(let c = 0; c < phenotype.classrooms.length; c++){
-      metaPhenotype.classrooms[`${c}`] = {
-        subjects: {}
-      }
-      for(let d = 0; d < phenotype.classrooms[c].days.length; d++){
-        metaPhenotype.classrooms[`${c}`][`${d}`] = {}
+    let metaPhenotype = metaScheduleOrganizerPhenotypeBuilder(this.#phenotypeProps, phenotype)
 
-        if(!(`${d}` in metaPhenotype.day)){
-          metaPhenotype.day[`${d}`] = {
-            subjectsBlocks: {
-              size: 0
-            }
-          }
-          metaPhenotype.day.size += 1
-        }
+    return score
+    // let metaPhenotype: any = {
+    //   classrooms: {},
+    //   teachers: [],
+    //   subjects: {
+    //     ids: []
+    //   },
+    //   day: {
+    //     size: 0
+    //   }
+    // }
+    // // build meta
+    // for(let c = 0; c < phenotype.classrooms.length; c++){
+    //   metaPhenotype.classrooms[`${c}`] = {
+    //     subjects: {}
+    //   }
+    //   for(let d = 0; d < phenotype.classrooms[c].days.length; d++){
+    //     metaPhenotype.classrooms[`${c}`][`${d}`] = {}
 
-        for(let s = 0; s < phenotype.classrooms[c].days[d].subjects.length; s++){
-          if(!(`${s}` in metaPhenotype.day[`${d}`].subjectsBlocks)){
-            metaPhenotype.day[`${d}`].subjectsBlocks[`${s}`] = []
-            metaPhenotype.day[`${d}`].subjectsBlocks.size += 1
-          }
+    //     if(!(`${d}` in metaPhenotype.day)){
+    //       metaPhenotype.day[`${d}`] = {
+    //         subjectsBlocks: {
+    //           size: 0
+    //         }
+    //       }
+    //       metaPhenotype.day.size += 1
+    //     }
 
-          let sId = phenotype.classrooms[c].days[d].subjects[s].id
-          if(sId == -1){
-            // REGRA: - Aula vazia
-            score -= PONTUATION.emptyClassPenality
-          }else{
-            if(!(metaPhenotype.subjects.ids.includes(sId))){
-              metaPhenotype.subjects.ids.push([sId])
-            }
+    //     for(let s = 0; s < phenotype.classrooms[c].days[d].subjects.length; s++){
+    //       if(!(`${s}` in metaPhenotype.day[`${d}`].subjectsBlocks)){
+    //         metaPhenotype.day[`${d}`].subjectsBlocks[`${s}`] = []
+    //         metaPhenotype.day[`${d}`].subjectsBlocks.size += 1
+    //       }
 
-            // salva quantidade total por classe
-            if(!(`${sId}` in metaPhenotype.classrooms[`${c}`].subjects)){
-              metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] = 0
-            }
-            metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] += 1
+    //       let sId = phenotype.classrooms[c].days[d].subjects[s].id
+    //       if(sId == -1){
+    //         // REGRA: - Aula vazia
+    //         score -= PONTUATION.emptyClassPenality
+    //       }else{
+    //         if(!(metaPhenotype.subjects.ids.includes(sId))){
+    //           metaPhenotype.subjects.ids.push([sId])
+    //         }
 
-            // salva quantidade de aulas no dia
-            if(`${sId}` in metaPhenotype.classrooms[`${c}`][`${d}`]){
-              metaPhenotype.classrooms[`${c}`][`${d}`][`${sId}`] += 1
-            }else{
-              metaPhenotype.classrooms[`${c}`][`${d}`][`${sId}`] = 1
-            }
-            metaPhenotype.day[`${d}`].subjectsBlocks[`${s}`].push(sId)
-          }
-        }
-      }
-    }
+    //         // salva quantidade total por classe
+    //         if(!(`${sId}` in metaPhenotype.classrooms[`${c}`].subjects)){
+    //           metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] = 0
+    //         }
+    //         metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] += 1
 
-    // teacherScore
-    for(let t = 0; t < this.#phenotypeProps.teachers.length; t++){
-      let tId = this.#phenotypeProps.teachers[t].id
+    //         // salva quantidade de aulas no dia
+    //         if(`${sId}` in metaPhenotype.classrooms[`${c}`][`${d}`]){
+    //           metaPhenotype.classrooms[`${c}`][`${d}`][`${sId}`] += 1
+    //         }else{
+    //           metaPhenotype.classrooms[`${c}`][`${d}`][`${sId}`] = 1
+    //         }
+    //         metaPhenotype.day[`${d}`].subjectsBlocks[`${s}`].push(sId)
+    //       }
+    //     }
+    //   }
+    // }
 
-      for(let d = 0; d < metaPhenotype.day.size; d++){
-        for(let s = 0; s < metaPhenotype.day[`${d}`].subjectsBlocks.size; s++){
-          let classesAtSameTime = 0
+    // // teacherScore
+    // for(let t = 0; t < this.#phenotypeProps.teachers.length; t++){
+    //   let tId = this.#phenotypeProps.teachers[t].id
 
-          // pega bloco do dia por bloco do dia
-          let subjectsBlock = metaPhenotype.day[`${d}`].subjectsBlocks[s]
-          for(let sb = 0; sb < subjectsBlock.length; sb++){
-            let sId = subjectsBlock[sb]
-            if(this.#teacherMeta[`${tId}`].includes(sId)){
-              classesAtSameTime += 1
-            }
-          }
+    //   for(let d = 0; d < metaPhenotype.day.size; d++){
+    //     for(let s = 0; s < metaPhenotype.day[`${d}`].subjectsBlocks.size; s++){
+    //       let classesAtSameTime = 0
 
-          // REGRA: - Prof em mais de uma aula na mesma hora
-          score -= (Math.max(classesAtSameTime - 1, 0)) * PONTUATION.classesAtSameTimePenality
-        }
-      }
-    }
-    // subjects score
-    for(let s = 0; s < metaPhenotype.subjects.ids.length; s++){
-      let sId = metaPhenotype.subjects.ids[s]
-      for(let c = 0; c < phenotype.classrooms.length; c++){
-        let sClasses = -1
-        for(let ac = 0; ac < this.#phenotypeProps.classrooms[`${c}`].acceptedSubjects.length; ac++){
-          if(this.#phenotypeProps.classrooms[`${c}`].acceptedSubjects[ac].subjectId){
-            sClasses = this.#phenotypeProps.classrooms[`${c}`].acceptedSubjects[ac].classes
-          }
-        }
+    //       // pega bloco do dia por bloco do dia
+    //       let subjectsBlock = metaPhenotype.day[`${d}`].subjectsBlocks[s]
+    //       for(let sb = 0; sb < subjectsBlock.length; sb++){
+    //         let sId = subjectsBlock[sb]
+    //         if(this.#teacherMeta[`${tId}`].includes(sId)){
+    //           classesAtSameTime += 1
+    //         }
+    //       }
 
-        if(sClasses != -1 &&
-            (metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] < sClasses ||
-            metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] > sClasses)
-          ){
-            let dif = Math.abs(metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] - sClasses)
-            // Regra: Matéria sem as aulas certinho: -E * nAulasFaltantes
-            score -= dif * PONTUATION.differentAmountOfClassesPenality
-        }
-      }
-    }
+    //       // REGRA: - Prof em mais de uma aula na mesma hora
+    //       score -= (Math.max(classesAtSameTime - 1, 0)) * PONTUATION.classesAtSameTimePenality
+    //     }
+    //   }
+    // }
+    // // subjects score
+    // for(let s = 0; s < metaPhenotype.subjects.ids.length; s++){
+    //   let sId = metaPhenotype.subjects.ids[s]
+    //   for(let c = 0; c < phenotype.classrooms.length; c++){
+    //     let sClasses = -1
+    //     for(let ac = 0; ac < this.#phenotypeProps.classrooms[`${c}`].acceptedSubjects.length; ac++){
+    //       if(this.#phenotypeProps.classrooms[`${c}`].acceptedSubjects[ac].subjectId){
+    //         sClasses = this.#phenotypeProps.classrooms[`${c}`].acceptedSubjects[ac].classes
+    //       }
+    //     }
+
+    //     if(sClasses != -1 &&
+    //         (metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] < sClasses ||
+    //         metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] > sClasses)
+    //       ){
+    //         let dif = Math.abs(metaPhenotype.classrooms[`${c}`].subjects[`${sId}`] - sClasses)
+    //         // Regra: Matéria sem as aulas certinho: -E * nAulasFaltantes
+    //         score -= dif * PONTUATION.differentAmountOfClassesPenality
+    //     }
+    //   }
+    // }
 
     // TODO:
     // - Matéria com mais aula seguida que a max: -C * nAulasAMais
@@ -329,6 +324,6 @@ export default class ScheduleOrganizerGenetic{
     // - Prof prefere max aula seguida e esta: +G
     // - Matérias com numero correto de aulas: +H
     // - Dia sem aula: +J
-    return score
+    // return score
   }
 }
