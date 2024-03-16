@@ -124,7 +124,7 @@ export default class ScheduleOrganizerGenetic{
     if(scoreA > scoreB){
       return true
     }
-    if(Math.random() < 0.05){
+    if(Math.random() < 0.08){
       return true
     }
     return false
@@ -164,7 +164,9 @@ export default class ScheduleOrganizerGenetic{
   }
   async evolve(){
     while(!this.#reachedTheStopMethod()){
-      console.warn('generation:',this.#currentGeneration)
+      if(this.#currentGeneration % 10 == 0){
+        console.warn('generation:',this.#currentGeneration)
+      }
       this.#g.evolve()
 
       let bestPhenotypeScore = this.#g.bestPhenotypesScores(1)
@@ -251,7 +253,7 @@ export default class ScheduleOrganizerGenetic{
             }
             if(subject.configuration.preferMaxConsecutiveClasses){
               if(subject.configuration.maxConsecutiveClasses == amount){
-                return PONTUATION.prefferMaxClassesReward
+                return -1 * PONTUATION.prefferMaxClassesReward
               }
               return PONTUATION.prefferMaxClassesPenality
             }
@@ -266,6 +268,22 @@ export default class ScheduleOrganizerGenetic{
           subjectId: -1,
           amount: 0
         }
+
+        // RULE: teacher free day
+        let teacherHasClassInDay = false
+        for(let t of metaPhenotype.teachers){
+          for(let subject of daySchedule){
+            if(subject.teacherId == t){
+              teacherHasClassInDay = true
+              break
+            }
+          }
+          if(teacherHasClassInDay) break
+        }
+        if(!teacherHasClassInDay){
+          score += PONTUATION.teacherFreeDayReward
+        }
+
         // RULE: Min Max Consecutive Classes
         for(let subject of daySchedule){
           if(lastSubject.subjectId == subject.id){
@@ -280,14 +298,18 @@ export default class ScheduleOrganizerGenetic{
         }
         if(lastSubject.subjectId != -1){
           score -= calculatePenalityScoreOfMinMaxConsecutiveClasses(this.#phenotypeProps, lastSubject.subjectId, lastSubject.amount)
+        }else{
+          score += PONTUATION.dayWithoutClassesReward
         }
       }
     }
 
     return score
-    // TODO:
-    // - Matérias com numero correto de aulas: +H
-    // - Dia sem aula: +J
-    // return score
+  }
+
+  printTest(){
+    let meta = metaScheduleOrganizerPhenotypeBuilder(this.#phenotypeProps, this.bestPhenotype()!)
+    console.log(meta)
+    this.#fitness(this.bestPhenotype()!)
   }
 }
