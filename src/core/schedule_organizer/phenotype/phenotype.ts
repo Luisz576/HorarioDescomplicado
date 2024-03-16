@@ -15,6 +15,8 @@ export default interface ScheduleOrganizerPhenotype{
   classrooms: Classroom[]
 }
 
+export const freeClassId = -1
+
 export function phenotypeToString(phenotype: ScheduleOrganizerPhenotype): string{
   let coded = ""
   for(let c = 0; c < phenotype.classrooms.length; c++){

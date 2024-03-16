@@ -1,6 +1,6 @@
 import MetaScheduleOrganizerPhenotype from "./meta_phenotype"
 import ScheduleOrganizerPhenotype from "./phenotype"
-import { BaseSubject, ScheduleOrganizerProps } from "./schedule_organizer_genetic"
+import { BaseSubject, ScheduleOrganizerProps } from "../schedule_organizer_genetic"
 
 export function getSubjectById(subjects: BaseSubject[], subjectId: number): BaseSubject | undefined{
   for(let i = 0; i < subjects.length; i++){
@@ -35,6 +35,7 @@ export default function metaScheduleOrganizerPhenotypeBuilder(pProps: ScheduleOr
         {
           id: d
         },
+        s,
         {
           id: subject.id,
           teacherId: getTeacherIdOfSubject(pProps, subject.id)

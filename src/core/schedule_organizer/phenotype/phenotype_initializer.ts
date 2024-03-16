@@ -1,5 +1,5 @@
 import ScheduleOrganizerPhenotype, { Day } from "./phenotype";
-import { ScheduleOrganizerProps, getAcceptableSubjectId } from "./schedule_organizer_genetic"
+import { ScheduleOrganizerProps, getAcceptableSubjectId } from "../schedule_organizer_genetic"
 
 export default function scheduleOrganizerPhenotypeInitializer(props: ScheduleOrganizerProps): ScheduleOrganizerPhenotype{
   let phenotype: ScheduleOrganizerPhenotype = {
@@ -10,12 +10,12 @@ export default function scheduleOrganizerPhenotypeInitializer(props: ScheduleOrg
     phenotype.classrooms.push({
       days: []
     })
-    for(let i = 0; i < props.classrooms[c].days.length; i++){
+    for(let d = 0; d < props.days.length; d++){
       let day: Day = {
         subjects: []
       }
 
-      for(let a = 0; a < 4; a++){ // fixado em 4 aulas por dia
+      for(let s = 0; s < props.days[d].classes; s++){ // fixado em 4 aulas por dia
         day.subjects.push({
           id: getAcceptableSubjectId(props, c)
         })
