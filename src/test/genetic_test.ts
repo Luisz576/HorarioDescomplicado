@@ -12,19 +12,19 @@ async function run(){
           {
             subjectId: 1,
             classes: 4
-          }
-        ]
-      },
-      {
-        acceptedSubjects: [
-          {
-            subjectId: 0,
-            classes: 4
           },
           {
             subjectId: 2,
             classes: 4
-          }
+          },
+          {
+            subjectId: 3,
+            classes: 3
+          },
+          {
+            subjectId: 4,
+            classes: 2
+          },
         ]
       }
     ],
@@ -56,16 +56,16 @@ async function run(){
         configuration: {
           maxConsecutiveClasses: 4,
           minConsecutiveClasses: 2,
-          preferMaxConsecutiveClasses: true
+          preferMaxConsecutiveClasses: false
         },
-        teacherId: 3
+        teacherId: 0
       },
       {
         id: 1,
         configuration: {
           maxConsecutiveClasses: 4,
           minConsecutiveClasses: 2,
-          preferMaxConsecutiveClasses: false
+          preferMaxConsecutiveClasses: true
         },
         teacherId: 1
       },
@@ -76,20 +76,47 @@ async function run(){
           minConsecutiveClasses: 2,
           preferMaxConsecutiveClasses: false
         },
+        teacherId: 2
+      },
+      {
+        id: 3,
+        configuration: {
+          maxConsecutiveClasses: 3,
+          minConsecutiveClasses: 2,
+          preferMaxConsecutiveClasses: false
+        },
         teacherId: 3
+      },
+      {
+        id: 4,
+        configuration: {
+          maxConsecutiveClasses: 2,
+          minConsecutiveClasses: 2,
+          preferMaxConsecutiveClasses: false
+        },
+        teacherId: 4
       }
     ],
     teachers: [
       {
-        id: 3
+        id: 0
       },
       {
         id: 1
+      },
+      {
+        id: 2
+      },
+      {
+        id: 3
+      },
+      {
+        id: 4
       }
     ]
   }, {
     mutationRate: 0.1,
-    populationSize: 200,
+    populationSize: 150,
     randomIndividualSize: 0,
     rankSlice: 1,
     roundsOfRoulette: 1,
@@ -105,14 +132,6 @@ async function run(){
   console.log('Classe 1, Dia 3:', g.bestPhenotype()!.classrooms[0].days[2])
   console.log('Classe 1, Dia 4:', g.bestPhenotype()!.classrooms[0].days[3])
   console.log('Classe 1, Dia 5:', g.bestPhenotype()!.classrooms[0].days[4])
-  console.log('===========================================================')
-  console.log('Classe 2, Dia 1:', g.bestPhenotype()!.classrooms[1].days[0])
-  console.log('Classe 2, Dia 2:', g.bestPhenotype()!.classrooms[1].days[1])
-  console.log('Classe 2, Dia 3:', g.bestPhenotype()!.classrooms[1].days[2])
-  console.log('Classe 2, Dia 4:', g.bestPhenotype()!.classrooms[1].days[3])
-  console.log('Classe 2, Dia 5:', g.bestPhenotype()!.classrooms[1].days[4])
-
-  g.printTest()
 }
 
 run()

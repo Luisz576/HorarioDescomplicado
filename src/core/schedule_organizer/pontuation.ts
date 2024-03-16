@@ -1,17 +1,18 @@
 const PONTUATION = {
   // penality
   emptyClassPenality: 1,
-  differentAmountOfClassesPenality: 12,
-  classesAtSameTimePenality: 15,
-  minClassesPenality: 8,
+  differentAmountOfClassesPenality: 10,
+  classesAtSameTimePenality: 20,
+  minClassesPenality: 5,
   maxClassesPenality: 8,
-  prefferMaxClassesPenality: 4,
+  prefferMaxClassesPenality: 3,
+  freeClassInMiddlePenality: 5,
 
   // reward
-  prefferMaxClassesReward: 3,
+  prefferMaxClassesReward: 1,
   correctAmountOfClassesReward: 1,
-  dayWithoutClassesReward: 5,
-  teacherFreeDayReward: 4,
+  dayWithoutClassesReward: 2,
+  teacherFreeDayReward: 1,
 }
 
 export default PONTUATION

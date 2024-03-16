@@ -32,6 +32,7 @@ export interface ScheduleOrganizerProps{
   subjects: BaseSubject[]
 }
 
+// TODO: add funcionalidade de ver se tem preferencia por materias que faltam
 export function getAcceptableSubjectId(pProps: ScheduleOrganizerProps, classId: number, canBeEmpty = true, maxIter = -1): number{
   if(canBeEmpty && Math.random() < 0.2){
     return freeClassId
@@ -207,6 +208,9 @@ export default class ScheduleOrganizerGenetic{
       score -= metaPhenotype.subjects.get(freeClassId)!.totalAmountOfClasses * PONTUATION.emptyClassPenality
     }
 
+    // TODO: aumentar penalidade se tiver aula livre e depois aula
+    // TODO: dar ponto por dia sem aula livre
+
     for(let [d, day] of metaPhenotype.days){
       for(let [sc, schedule] of day.schedule){
         let classesAtSameTime = new Map<number, number>()
@@ -255,19 +259,18 @@ export default class ScheduleOrganizerGenetic{
               if(subject.configuration.maxConsecutiveClasses == amount){
                 return -1 * PONTUATION.prefferMaxClassesReward
               }
-              return PONTUATION.prefferMaxClassesPenality
+              return PONTUATION.prefferMaxClassesPenality * amount
             }
           }
         }
-        return 0
+        if(subjectId == -2){
+          return 0
+        }
+        return PONTUATION.freeClassInMiddlePenality
         // TODO: pode colocar preferencia de ter max aulas aqui
       }
       for(let [d, day] of metaPhenotype.days){
         let daySchedule = classroom.schedule.get(day.id)!
-        let lastSubject = {
-          subjectId: -1,
-          amount: 0
-        }
 
         // RULE: teacher free day
         let teacherHasClassInDay = false
@@ -284,11 +287,24 @@ export default class ScheduleOrganizerGenetic{
           score += PONTUATION.teacherFreeDayReward
         }
 
+        let someValidSubject = false
+        let lastSubject = {
+          subjectId: -2,
+          amount: 0
+        }
         // RULE: Min Max Consecutive Classes
         for(let subject of daySchedule){
           if(lastSubject.subjectId == subject.id){
             lastSubject.amount += 1
           }else{
+            if(subject.id == freeClassId){
+              lastSubject = {
+                amount: 1,
+                subjectId: freeClassId
+              }
+              continue
+            }
+            someValidSubject = true
             score -= calculatePenalityScoreOfMinMaxConsecutiveClasses(this.#phenotypeProps, lastSubject.subjectId, lastSubject.amount)
             lastSubject = {
               amount: 1,
@@ -296,8 +312,12 @@ export default class ScheduleOrganizerGenetic{
             }
           }
         }
-        if(lastSubject.subjectId != -1){
-          score -= calculatePenalityScoreOfMinMaxConsecutiveClasses(this.#phenotypeProps, lastSubject.subjectId, lastSubject.amount)
+        if(lastSubject.subjectId != -2){
+          if(someValidSubject){
+            score -= calculatePenalityScoreOfMinMaxConsecutiveClasses(this.#phenotypeProps, lastSubject.subjectId, lastSubject.amount)
+          }else{
+            score += PONTUATION.dayWithoutClassesReward
+          }
         }else{
           score += PONTUATION.dayWithoutClassesReward
         }
@@ -305,11 +325,5 @@ export default class ScheduleOrganizerGenetic{
     }
 
     return score
-  }
-
-  printTest(){
-    let meta = metaScheduleOrganizerPhenotypeBuilder(this.#phenotypeProps, this.bestPhenotype()!)
-    console.log(meta)
-    this.#fitness(this.bestPhenotype()!)
   }
 }
