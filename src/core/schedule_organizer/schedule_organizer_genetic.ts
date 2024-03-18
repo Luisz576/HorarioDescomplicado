@@ -103,20 +103,19 @@ export default class ScheduleOrganizerGenetic{
     let randomDay = randomInt(x.classrooms[randomClass].days.length)
     let randomSubject = randomInt(x.classrooms[randomClass].days[randomDay].subjects.length)
     x.classrooms[randomClass].days[randomDay].subjects[randomSubject] = y.classrooms[randomClass].days[randomDay].subjects[randomSubject]
-    if(Math.random() < this.#g.config().mutationRate){
-      x = this.#mutatePhenotype(x)
-    }
     return x
   }
 
   #mutatePhenotype(phenotype: ScheduleOrganizerPhenotype){
-    // TODO: talvez alterar?
-    let randomClass = randomInt(phenotype.classrooms.length)
-    let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
-    let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
-    let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass, true)
-    phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
-      id: sId
+    let x = Math.floor(Math.random() * 3) + 1
+    for(let i = 0; i < x; i++){
+      let randomClass = randomInt(phenotype.classrooms.length)
+      let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
+      let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
+      let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass, true)
+      phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
+        id: sId
+      }
     }
     return phenotype
   }
@@ -127,7 +126,7 @@ export default class ScheduleOrganizerGenetic{
     if(scoreA > scoreB){
       return true
     }
-    if(Math.random() < 0.08){
+    if(Math.random() < 0.05){
       return true
     }
     return false
@@ -165,6 +164,7 @@ export default class ScheduleOrganizerGenetic{
       return this.#generationsWithoutBetter >= this.#maxOrWithoutBetterGenerations
     }
   }
+
   async evolve(){
     while(!this.#reachedTheStopMethod()){
       if(this.#currentGeneration % 10 == 0){
@@ -193,6 +193,40 @@ export default class ScheduleOrganizerGenetic{
     if(metaPhenotype.subjects.has(freeClassId)){
       // RULE: Aula vazia
       score -= metaPhenotype.subjects.get(freeClassId)!.totalAmountOfClasses * PONTUATION.emptyClassPenality
+    }
+
+    for(let classrom of metaPhenotype.classrooms.values()){
+      // RULE: differentAmountOfClassesPenality
+      for(let cSubject of this.#phenotypeProps.classrooms[classrom.id].acceptedSubjects){
+        let cSubjectVerified = false
+        for(let [subjectId, classes] of classrom.totalAmountOfClassesBySubject){
+          if(cSubject.subjectId == subjectId){
+            cSubjectVerified = true
+            if(classes != cSubject.classes){
+              score -= Math.abs(cSubject.classes - classes) * PONTUATION.differentAmountOfClassesPenality
+            }
+            break
+          }
+        }
+        if(!cSubjectVerified){
+          score -= cSubject.classes * PONTUATION.differentAmountOfClassesPenality
+        }
+      }
+    }
+
+    // RULE: classesAtSameTimePenality
+    for(let day of metaPhenotype.days.values()){
+      for(let schedule of day.schedule.values()){
+        let teacherClassesInTimeBlock = new Map<number, number>()
+        for(let s of schedule){
+          let amount = teacherClassesInTimeBlock.get(s.teacherId) ?? 0
+          amount += 1
+          teacherClassesInTimeBlock.set(s.teacherId, amount)
+          if(amount > 0){
+            score -= PONTUATION.classesAtSameTimePenality
+          }
+        }
+      }
     }
 
     return score
