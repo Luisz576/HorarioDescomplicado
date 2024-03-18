@@ -26,6 +26,30 @@ async function run(){
             classes: 2
           },
         ]
+      },
+      {
+        acceptedSubjects: [
+          {
+            subjectId: 5,
+            classes: 4
+          },
+          {
+            subjectId: 6,
+            classes: 3
+          },
+          {
+            subjectId: 7,
+            classes: 3
+          },
+          {
+            subjectId: 8,
+            classes: 5
+          },
+          {
+            subjectId: 9,
+            classes: 3
+          },
+        ]
       }
     ],
     days: [
@@ -95,6 +119,51 @@ async function run(){
           preferMaxConsecutiveClasses: false
         },
         teacherId: 4
+      },
+      {
+        id: 5,
+        configuration: {
+          maxConsecutiveClasses: 2,
+          minConsecutiveClasses: 4,
+          preferMaxConsecutiveClasses: false
+        },
+        teacherId: 5
+      },
+      {
+        id: 6,
+        configuration: {
+          maxConsecutiveClasses: 2,
+          minConsecutiveClasses: 3,
+          preferMaxConsecutiveClasses: false
+        },
+        teacherId: 4
+      },
+      {
+        id: 7,
+        configuration: {
+          maxConsecutiveClasses: 2,
+          minConsecutiveClasses: 3,
+          preferMaxConsecutiveClasses: false
+        },
+        teacherId: 6
+      },
+      {
+        id: 8,
+        configuration: {
+          maxConsecutiveClasses: 2,
+          minConsecutiveClasses: 4,
+          preferMaxConsecutiveClasses: false
+        },
+        teacherId: 7
+      },
+      {
+        id: 9,
+        configuration: {
+          maxConsecutiveClasses: 2,
+          minConsecutiveClasses: 3,
+          preferMaxConsecutiveClasses: false
+        },
+        teacherId: 2
       }
     ],
     teachers: [
@@ -112,6 +181,15 @@ async function run(){
       },
       {
         id: 4
+      },
+      {
+        id: 5
+      },
+      {
+        id: 6
+      },
+      {
+        id: 7
       }
     ]
   }, {
@@ -132,6 +210,12 @@ async function run(){
   console.log('Classe 1, Dia 3:', g.bestPhenotype()!.classrooms[0].days[2])
   console.log('Classe 1, Dia 4:', g.bestPhenotype()!.classrooms[0].days[3])
   console.log('Classe 1, Dia 5:', g.bestPhenotype()!.classrooms[0].days[4])
+  console.log('============================')
+  console.log('Classe 2, Dia 1:', g.bestPhenotype()!.classrooms[1].days[0])
+  console.log('Classe 2, Dia 2:', g.bestPhenotype()!.classrooms[1].days[1])
+  console.log('Classe 2, Dia 3:', g.bestPhenotype()!.classrooms[1].days[2])
+  console.log('Classe 2, Dia 4:', g.bestPhenotype()!.classrooms[1].days[3])
+  console.log('Classe 2, Dia 5:', g.bestPhenotype()!.classrooms[1].days[4])
 }
 
 run()
