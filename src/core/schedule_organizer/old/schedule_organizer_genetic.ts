@@ -1,4 +1,4 @@
-import Genetic, { GeneticConfiguration } from "../../lib/genetic/genetic"
+/*import Genetic, { GeneticConfiguration } from "../../lib/genetic/genetic"
 import IGeneticConfiguration, { StopMethod } from "../domain/model/configuration/igenetic_configuration"
 import ScheduleOrganizerPhenotype, { freeClassId } from "./phenotype/phenotype"
 import scheduleOrganizerPhenotypeInitializer from "./phenotype/phenotype_initializer"
@@ -98,7 +98,6 @@ export default class ScheduleOrganizerGenetic{
       x = phenotypeB
       y = phenotypeA
     }
-    // TODO: criar operador em dois pontos ao invés de 1?
     let randomClass = randomInt(x.classrooms.length)
     let randomDay = randomInt(x.classrooms[randomClass].days.length)
     let randomSubject = randomInt(x.classrooms[randomClass].days[randomDay].subjects.length)
@@ -110,7 +109,6 @@ export default class ScheduleOrganizerGenetic{
   }
 
   #mutatePhenotype(phenotype: ScheduleOrganizerPhenotype){
-    // TODO: talvez alterar?
     let randomClass = randomInt(phenotype.classrooms.length)
     let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
     let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
@@ -185,6 +183,21 @@ export default class ScheduleOrganizerGenetic{
     }
   }
 
+  /*
+  Penalidade:
+  - Aula vazia: -1
+  - Prof em mais de uma aula na mesma hora: -B
+  - Matéria com mais aula seguida que a max: -C
+  - Matéria prefere max aula seguida mas não está: -D
+  - Matéria sem todas as classes: -E * nAulasFaltantes
+  - Matéria com menos aulas do que o min class: -F
+
+  Recompensa:
+  - Prof prefere max aula seguida e esta: +G
+  - Matérias com numero correto de aulas: +H
+  - Dia com horários okays: +I
+  - Dia sem aula: +J
+  *//*
   #fitness(phenotype: ScheduleOrganizerPhenotype): number{
     let score = 0
 
@@ -195,6 +208,124 @@ export default class ScheduleOrganizerGenetic{
       score -= metaPhenotype.subjects.get(freeClassId)!.totalAmountOfClasses * PONTUATION.emptyClassPenality
     }
 
+    // TODO: aumentar penalidade se tiver aula livre e depois aula
+    // TODO: dar ponto por dia sem aula livre
+
+    for(let [d, day] of metaPhenotype.days){
+      for(let [sc, schedule] of day.schedule){
+        let classesAtSameTime = new Map<number, number>()
+        for(let dayTime in schedule){
+          let teacherClassesAtSameTime = classesAtSameTime.get(schedule[dayTime].teacherId) ?? -1
+          classesAtSameTime.set(schedule[dayTime].teacherId, teacherClassesAtSameTime + 1)
+        }
+        for(let [tcast, teacherClassesAtSameTime] of classesAtSameTime){
+          // RULE: Prof em mais de uma aula na mesma hora
+          score -= teacherClassesAtSameTime * PONTUATION.classesAtSameTimePenality
+        }
+      }
+    }
+
+    for(let [c, classroom] of metaPhenotype.classrooms){
+      for(let [subjectId, totalAmountOfClassesOfSubjectOfClassroom] of classroom.totalAmountOfClassesBySubject){
+        if(subjectId == freeClassId){
+          continue
+        }
+        for(let subject of this.#phenotypeProps.classrooms[classroom.id].acceptedSubjects){
+          if(subject.subjectId == subjectId){
+            if(subject.classes == totalAmountOfClassesOfSubjectOfClassroom){
+              // RULE: Matéria com as aulas certinho
+              score += PONTUATION.correctAmountOfClassesReward
+            }else{
+              // RULE: Matéria sem as aulas certinho
+              score -= Math.abs(subject.classes - totalAmountOfClassesOfSubjectOfClassroom) * PONTUATION.differentAmountOfClassesPenality
+            }
+          }
+        }
+      }
+
+      function calculatePenalityScoreOfMinMaxConsecutiveClasses(pProps: ScheduleOrganizerProps, subjectId: number, amount: number): number{
+        if(subjectId != freeClassId){
+          let subject = getSubjectById(pProps.subjects, subjectId)
+          if(subject){
+            if(subject.configuration.minConsecutiveClasses > amount){
+              // RULE: menos de minClasses
+              return (subject.configuration.minConsecutiveClasses - amount) * PONTUATION.minClassesPenality
+            }
+            if(subject.configuration.maxConsecutiveClasses < amount){
+              // RULE: mais de maxClasses
+              return (amount - subject.configuration.minConsecutiveClasses) * PONTUATION.maxClassesPenality
+            }
+            if(subject.configuration.preferMaxConsecutiveClasses){
+              if(subject.configuration.maxConsecutiveClasses == amount){
+                return -1 * PONTUATION.prefferMaxClassesReward
+              }
+              return PONTUATION.prefferMaxClassesPenality * amount
+            }
+          }
+        }
+        if(subjectId == -2){
+          return 0
+        } // AJUSTAR, ESTA ERRADO ISSO DO FREE CLASS
+        return 0
+        return PONTUATION.freeClassInMiddlePenality
+        // TODO: pode colocar preferencia de ter max aulas aqui
+      }
+      for(let [d, day] of metaPhenotype.days){
+        let daySchedule = classroom.schedule.get(day.id)!
+
+        // RULE: teacher free day
+        let teacherHasClassInDay = false
+        for(let t of metaPhenotype.teachers){
+          for(let subject of daySchedule){
+            if(subject.teacherId == t){
+              teacherHasClassInDay = true
+              break
+            }
+          }
+          if(teacherHasClassInDay) break
+        }
+        if(!teacherHasClassInDay){
+          score += PONTUATION.teacherFreeDayReward
+        }
+
+        let someValidSubject = false
+        let lastSubject = {
+          subjectId: -2,
+          amount: 0
+        }
+        // RULE: Min Max Consecutive Classes
+        for(let subject of daySchedule){
+          if(lastSubject.subjectId == subject.id){
+            lastSubject.amount += 1
+          }else{
+            if(subject.id == freeClassId){
+              lastSubject = {
+                amount: 1,
+                subjectId: freeClassId
+              }
+              continue
+            }
+            someValidSubject = true
+            score -= calculatePenalityScoreOfMinMaxConsecutiveClasses(this.#phenotypeProps, lastSubject.subjectId, lastSubject.amount)
+            lastSubject = {
+              amount: 1,
+              subjectId: subject.id
+            }
+          }
+        }
+        if(lastSubject.subjectId != -2){
+          if(someValidSubject){
+            score -= calculatePenalityScoreOfMinMaxConsecutiveClasses(this.#phenotypeProps, lastSubject.subjectId, lastSubject.amount)
+          }else{
+            score += PONTUATION.dayWithoutClassesReward
+          }
+        }else{
+          score += PONTUATION.dayWithoutClassesReward
+        }
+      }
+    }
+
     return score
   }
 }
+*/
