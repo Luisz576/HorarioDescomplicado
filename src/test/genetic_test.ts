@@ -199,11 +199,13 @@ async function run(){
     rankSlice: 1,
     roundsOfRoulette: 1,
     selectionMethod: 'COMPETITION',
-    stopMethod: 'GENERATIONS_WITHOUT_BETTER_SCORE',
-    maxOrWithoutBetterGenerations: 100,
+    stopMethod: 'MAX_GENERATIONS',
+    maxOrWithoutBetterGenerations: 1000,
   })
 
-  await g.evolve()
+  await g.evolve((generation) => {
+    console.warn('generation:', generation, `${(100.0*generation/1000.0)}%`)
+  })
 
   console.log('Classe 1, Dia 1:', g.bestPhenotype()!.classrooms[0].days[0])
   console.log('Classe 1, Dia 2:', g.bestPhenotype()!.classrooms[0].days[1])

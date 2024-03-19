@@ -107,27 +107,23 @@ export default class ScheduleOrganizerGenetic{
   }
 
   #mutatePhenotype(phenotype: ScheduleOrganizerPhenotype){
-    let x = Math.floor(Math.random() * 3) + 1
-    for(let i = 0; i < x; i++){
-      if(Math.random() < 0.5){
-        let randomClass = randomInt(phenotype.classrooms.length)
-        let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
-        let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
-        let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass, true)
-        phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
-          id: sId
-        }
-      }else{
-        let randomClass = randomInt(phenotype.classrooms.length)
-        let randomDay1 = randomInt(phenotype.classrooms[randomClass].days.length)
-        let randomSubject1 = randomInt(phenotype.classrooms[randomClass].days[randomDay1].subjects.length)
-        let randomDay2= randomInt(phenotype.classrooms[randomClass].days.length)
-        let randomSubject2 = randomInt(phenotype.classrooms[randomClass].days[randomDay2].subjects.length)
-        let s1 = phenotype.classrooms[randomClass].days[randomDay1].subjects[randomSubject1]
-        let s2 = phenotype.classrooms[randomClass].days[randomDay2].subjects[randomSubject2]
-        phenotype.classrooms[randomClass].days[randomDay1].subjects[randomSubject1] = s2
-        phenotype.classrooms[randomClass].days[randomDay2].subjects[randomSubject2] = s1
-      }
+    let randomClass = randomInt(phenotype.classrooms.length)
+    let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
+    let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
+    let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass, true)
+    phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
+      id: sId
+    }
+    if(Math.random() < 0.5){
+      let randomClass = randomInt(phenotype.classrooms.length)
+      let randomDay1 = randomInt(phenotype.classrooms[randomClass].days.length)
+      let randomSubject1 = randomInt(phenotype.classrooms[randomClass].days[randomDay1].subjects.length)
+      let randomDay2= randomInt(phenotype.classrooms[randomClass].days.length)
+      let randomSubject2 = randomInt(phenotype.classrooms[randomClass].days[randomDay2].subjects.length)
+      let s1 = phenotype.classrooms[randomClass].days[randomDay1].subjects[randomSubject1]
+      let s2 = phenotype.classrooms[randomClass].days[randomDay2].subjects[randomSubject2]
+      phenotype.classrooms[randomClass].days[randomDay1].subjects[randomSubject1] = s2
+      phenotype.classrooms[randomClass].days[randomDay2].subjects[randomSubject2] = s1
     }
     return phenotype
   }
@@ -138,7 +134,7 @@ export default class ScheduleOrganizerGenetic{
     if(scoreA > scoreB){
       return true
     }
-    if(Math.random() < 0.05){
+    if(Math.abs(scoreB - scoreA) < 10){
       return true
     }
     return false
@@ -177,10 +173,10 @@ export default class ScheduleOrganizerGenetic{
     }
   }
 
-  async evolve(){
+  async evolve(callbackEach10Generations?: (generation: number) => void){
     while(!this.#reachedTheStopMethod()){
-      if(this.#currentGeneration % 10 == 0){
-        console.warn('generation:',this.#currentGeneration)
+      if(callbackEach10Generations && this.#currentGeneration % 10 == 0){
+        callbackEach10Generations(this.#currentGeneration)
       }
       this.#g.evolve()
 
@@ -197,6 +193,22 @@ export default class ScheduleOrganizerGenetic{
     }
   }
 
+  #calculateSubjectClassesPenality(subjectId: number, amount: number): number{
+    if(subjectId != freeClassId){
+      let targetSubject = getSubjectById(this.#phenotypeProps.subjects, subjectId)!
+      if(targetSubject.configuration.minConsecutiveClasses > amount){
+        return PONTUATION.minClassesPenality
+      }
+      if(targetSubject.configuration.maxConsecutiveClasses < amount){
+        return PONTUATION.maxClassesPenality
+      }
+      if(targetSubject.configuration.preferMaxConsecutiveClasses &&
+        targetSubject.configuration.maxConsecutiveClasses != amount){
+        return PONTUATION.prefferMaxClassesPenality
+      }
+    }
+    return 0
+  }
   #fitness(phenotype: ScheduleOrganizerPhenotype): number{
     let score = 0
 
@@ -228,6 +240,10 @@ export default class ScheduleOrganizerGenetic{
       //
       for(let daySchedule of classrom.schedule.values()){
         let freeClassesInDay = 0
+        let lastSubject = {
+          subjectId: -1,
+          amount: 0
+        }
 
         for(let subject of daySchedule){
           if(subject.id == freeClassId){
@@ -239,7 +255,18 @@ export default class ScheduleOrganizerGenetic{
               freeClassesInDay = 0
             }
           }
+
+          if(lastSubject.subjectId != subject.id){
+            score -= this.#calculateSubjectClassesPenality(lastSubject.subjectId, lastSubject.amount)
+            lastSubject = {
+              subjectId: subject.id,
+              amount: 0
+            }
+          }
+          lastSubject.amount += 1
         }
+
+        score -= this.#calculateSubjectClassesPenality(lastSubject.subjectId, lastSubject.amount)
       }
     }
 
