@@ -32,7 +32,6 @@ export interface ScheduleOrganizerProps{
   subjects: BaseSubject[]
 }
 
-// TODO: add funcionalidade de ver se tem preferencia por materias que faltam
 export function getAcceptableSubjectId(pProps: ScheduleOrganizerProps, classId: number, canBeEmpty = true, maxIter = -1): number{
   if(canBeEmpty && Math.random() < 0.2){
     return freeClassId
@@ -98,49 +97,71 @@ export default class ScheduleOrganizerGenetic{
       x = phenotypeB
       y = phenotypeA
     }
-    // TODO: criar operador em dois pontos ao invés de 1?
-    let randomClass = randomInt(x.classrooms.length)
-    let randomDay = randomInt(x.classrooms[randomClass].days.length)
-    let randomSubject = randomInt(x.classrooms[randomClass].days[randomDay].subjects.length)
-    x.classrooms[randomClass].days[randomDay].subjects[randomSubject] = y.classrooms[randomClass].days[randomDay].subjects[randomSubject]
+    if(Math.random() < 0.5){
+      let randomClass = randomInt(x.classrooms.length)
+      let randomDay1 = randomInt(x.classrooms[randomClass].days.length)
+      let randomDay2 = randomInt(x.classrooms[randomClass].days.length)
+      let randomSubject1 = randomInt(x.classrooms[randomClass].days[randomDay1].subjects.length)
+      let randomSubject2 = randomInt(x.classrooms[randomClass].days[randomDay2].subjects.length)
+      x.classrooms[randomClass].days[randomDay1].subjects[randomSubject1] = y.classrooms[randomClass].days[randomDay2].subjects[randomSubject2]
+    }else{
+      x = this.#changeBlockOfTime(x, y)
+    }
     return x
   }
 
-  #changeBlockOfTime(phenotype: ScheduleOrganizerPhenotype){
-    let randomClass = randomInt(phenotype.classrooms.length)
+  #changeBlockOfTime(phenotypeA: ScheduleOrganizerPhenotype, phenotypeB: ScheduleOrganizerPhenotype): ScheduleOrganizerPhenotype{
+    let X, Y: ScheduleOrganizerPhenotype
+    if(Math.random() < 0.5){
+      X = phenotypeA
+      Y = phenotypeB
+    }else{
+      X = phenotypeB
+      Y = phenotypeA
+    }
+    let randomClass = randomInt(X.classrooms.length)
     if(Math.random() < 0.5){
       // full day
-      let randomDay1 = randomInt(phenotype.classrooms[randomClass].days.length)
-      let randomDay2 = randomInt(phenotype.classrooms[randomClass].days.length)
-      let aux = phenotype.classrooms[randomClass].days[randomDay1]
-      phenotype.classrooms[randomClass].days[randomDay1] = phenotype.classrooms[randomClass].days[randomDay2]
-      phenotype.classrooms[randomClass].days[randomDay2] = aux
+      let randomDay1 = randomInt(X.classrooms[randomClass].days.length)
+      let randomDay2 = randomInt(X.classrooms[randomClass].days.length)
+      let aux = X.classrooms[randomClass].days[randomDay1]
+      X.classrooms[randomClass].days[randomDay1] = Y.classrooms[randomClass].days[randomDay2]
+      Y.classrooms[randomClass].days[randomDay2] = aux
     }else{
       // block in schedule
       let scheduleBlock = []
-      let randomBlock = Math.floor(Math.random() * phenotype.classrooms[randomClass].days[0].subjects.length)
-      for(let daySchedule of phenotype.classrooms[randomClass].days){
+      let randomBlock = randomInt(X.classrooms[randomClass].days[0].subjects.length)
+      for(let daySchedule of Y.classrooms[randomClass].days){
         scheduleBlock.push(daySchedule.subjects[randomBlock])
       }
-      scheduleBlock.sort((_a, _b) => [-1,0,1][Math.floor(Math.random() * 3)])
-      for(let d in phenotype.classrooms[randomClass].days){
-        phenotype.classrooms[randomClass].days[d].subjects[randomBlock] = scheduleBlock[d]
+      for(let d in X.classrooms[randomClass].days){
+        X.classrooms[randomClass].days[d].subjects[randomBlock] = scheduleBlock[d]
       }
     }
-    return phenotype
+    return X
   }
-  #mutatePhenotype(phenotype: ScheduleOrganizerPhenotype){
-    if(Math.random() < 0.2){
-      return this.#changeBlockOfTime(phenotype)
+  #mutatePhenotype(phenotype: ScheduleOrganizerPhenotype): ScheduleOrganizerPhenotype{
+    if(Math.random() < 0.4){
+      return this.#changeBlockOfTime(phenotype, phenotype)
     }else{
-      let x = Math.floor(Math.random() * 2) + 1
+      let x = Math.floor(Math.random() * 4) + 1
       for(let i = 0; i < x; i++){
         let randomClass = randomInt(phenotype.classrooms.length)
-        let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
-        let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
-        let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass, true)
-        phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
-          id: sId
+        if(Math.random() < 0.5){
+          let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
+          let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
+          let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass, true)
+          phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
+            id: sId
+          }
+        }else{
+          let randomDay1 = randomInt(phenotype.classrooms[randomClass].days.length)
+          let randomDay2 = randomInt(phenotype.classrooms[randomClass].days.length)
+          let randomSubject1 = randomInt(phenotype.classrooms[randomClass].days[randomDay1].subjects.length)
+          let randomSubject2 = randomInt(phenotype.classrooms[randomClass].days[randomDay2].subjects.length)
+          let aux = phenotype.classrooms[randomClass].days[randomDay1].subjects[randomSubject1]
+          phenotype.classrooms[randomClass].days[randomDay1].subjects[randomSubject1] = phenotype.classrooms[randomClass].days[randomDay2].subjects[randomSubject2]
+          phenotype.classrooms[randomClass].days[randomDay2].subjects[randomSubject2] = aux
         }
       }
     }
@@ -192,10 +213,11 @@ export default class ScheduleOrganizerGenetic{
     }
   }
 
-  async evolve(callbackEach10Generations?: (generation: number) => void){
-    while(!this.#reachedTheStopMethod()){
+  async evolve(callbackEach10Generations?: (generation: number) => boolean){
+    let run = true
+    while(!this.#reachedTheStopMethod() && run){
       if(callbackEach10Generations && this.#currentGeneration % 10 == 0){
-        callbackEach10Generations(this.#currentGeneration)
+        run = callbackEach10Generations(this.#currentGeneration)
       }
       this.#g.evolve()
 

@@ -15,7 +15,7 @@ async function run(){
           },
           {
             subjectId: 2,
-            classes: 4
+            classes: 5
           },
           {
             subjectId: 3,
@@ -196,15 +196,16 @@ async function run(){
     mutationRate: 0.1,
     populationSize: 150,
     randomIndividualSize: 0,
-    rankSlice: 1,
+    rankSlice: 15,
     roundsOfRoulette: 1,
-    selectionMethod: 'COMPETITION',
-    stopMethod: 'MAX_GENERATIONS',
-    maxOrWithoutBetterGenerations: 1000,
+    selectionMethod: "RANK",
+    stopMethod: 'GENERATIONS_WITHOUT_BETTER_SCORE',
+    maxOrWithoutBetterGenerations: 200,
   })
 
   await g.evolve((generation) => {
-    console.warn('generation:', generation, `${(100.0*generation/1000.0)}%`)
+    console.warn('generation:', generation)
+    return true
   })
 
   console.log('Classe 1, Dia 1:', g.bestPhenotype()!.classrooms[0].days[0])

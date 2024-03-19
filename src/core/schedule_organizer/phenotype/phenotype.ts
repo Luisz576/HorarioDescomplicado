@@ -27,11 +27,13 @@ export function phenotypeToString(phenotype: ScheduleOrganizerPhenotype): string
         }
         coded += phenotype.classrooms[c].days[d].subjects[s]
       }
+      coded += '-'
     }
+    coded += "_"
   }
   return coded
 }
 
 // export function stringToPhenotype(str: string, props: ): ScheduleOrganizerPhenotype{
-
+  //TODO: decriptor
 // }
