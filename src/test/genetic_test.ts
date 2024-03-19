@@ -15,7 +15,7 @@ async function run(){
           },
           {
             subjectId: 2,
-            classes: 5
+            classes: 4
           },
           {
             subjectId: 3,
