@@ -106,24 +106,43 @@ export default class ScheduleOrganizerGenetic{
     return x
   }
 
-  #mutatePhenotype(phenotype: ScheduleOrganizerPhenotype){
+  #changeBlockOfTime(phenotype: ScheduleOrganizerPhenotype){
     let randomClass = randomInt(phenotype.classrooms.length)
-    let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
-    let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
-    let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass, true)
-    phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
-      id: sId
-    }
     if(Math.random() < 0.5){
-      let randomClass = randomInt(phenotype.classrooms.length)
+      // full day
       let randomDay1 = randomInt(phenotype.classrooms[randomClass].days.length)
-      let randomSubject1 = randomInt(phenotype.classrooms[randomClass].days[randomDay1].subjects.length)
-      let randomDay2= randomInt(phenotype.classrooms[randomClass].days.length)
-      let randomSubject2 = randomInt(phenotype.classrooms[randomClass].days[randomDay2].subjects.length)
-      let s1 = phenotype.classrooms[randomClass].days[randomDay1].subjects[randomSubject1]
-      let s2 = phenotype.classrooms[randomClass].days[randomDay2].subjects[randomSubject2]
-      phenotype.classrooms[randomClass].days[randomDay1].subjects[randomSubject1] = s2
-      phenotype.classrooms[randomClass].days[randomDay2].subjects[randomSubject2] = s1
+      let randomDay2 = randomInt(phenotype.classrooms[randomClass].days.length)
+      let aux = phenotype.classrooms[randomClass].days[randomDay1]
+      phenotype.classrooms[randomClass].days[randomDay1] = phenotype.classrooms[randomClass].days[randomDay2]
+      phenotype.classrooms[randomClass].days[randomDay2] = aux
+    }else{
+      // block in schedule
+      let scheduleBlock = []
+      let randomBlock = Math.floor(Math.random() * phenotype.classrooms[randomClass].days[0].subjects.length)
+      for(let daySchedule of phenotype.classrooms[randomClass].days){
+        scheduleBlock.push(daySchedule.subjects[randomBlock])
+      }
+      scheduleBlock.sort((_a, _b) => [-1,0,1][Math.floor(Math.random() * 3)])
+      for(let d in phenotype.classrooms[randomClass].days){
+        phenotype.classrooms[randomClass].days[d].subjects[randomBlock] = scheduleBlock[d]
+      }
+    }
+    return phenotype
+  }
+  #mutatePhenotype(phenotype: ScheduleOrganizerPhenotype){
+    if(Math.random() < 0.2){
+      return this.#changeBlockOfTime(phenotype)
+    }else{
+      let x = Math.floor(Math.random() * 2) + 1
+      for(let i = 0; i < x; i++){
+        let randomClass = randomInt(phenotype.classrooms.length)
+        let randomDay = randomInt(phenotype.classrooms[randomClass].days.length)
+        let randomSubject = randomInt(phenotype.classrooms[randomClass].days[randomDay].subjects.length)
+        let sId = getAcceptableSubjectId(this.#phenotypeProps, randomClass, true)
+        phenotype.classrooms[randomClass].days[randomDay].subjects[randomSubject] = {
+          id: sId
+        }
+      }
     }
     return phenotype
   }
@@ -134,7 +153,7 @@ export default class ScheduleOrganizerGenetic{
     if(scoreA > scoreB){
       return true
     }
-    if(Math.abs(scoreB - scoreA) < 10){
+    if(Math.abs(scoreB - scoreA) < 30 && Math.random() < 0.5){
       return true
     }
     return false
