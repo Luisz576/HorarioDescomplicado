@@ -1,4 +1,4 @@
-import IHttpContext from "../../core/domain/http/ihttp_context";
+import IHttpContext from "../../core/domain/contracts/http/ihttp_context";
 import GetClientName from "../usecase/auth/get_client_name";
 import createProject from "../usecase/project/create_project";
 import deleteProject from "../usecase/project/delete_project";

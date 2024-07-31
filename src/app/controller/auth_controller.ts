@@ -1,4 +1,4 @@
-import IHttpContext from "../../core/domain/http/ihttp_context";
+import IHttpContext from "../../core/domain/contracts/http/ihttp_context";
 import authenticator from "../service/authenticator";
 
 export default class AuthController{

@@ -1,6 +1,6 @@
-import IHttpContext from "../../core/domain/http/ihttp_context"
+import IHttpContext from "../../core/domain/contracts/http/ihttp_context"
 import AuthenticateToken from "../usecase/auth/authenticate_token"
-import logError from "../../core/utils/log_error"
+import logError from "../../core/functions/log_error"
 
 export default class AuthenticatorMiddleware{
     constructor(

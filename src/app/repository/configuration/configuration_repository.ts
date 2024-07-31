@@ -2,7 +2,7 @@ import IGeneticConfiguration from "../../../core/domain/model/configuration/igen
 import IProjectConfiguration from "../../../core/domain/model/configuration/iproject_configuration"
 import IConfigurationRepository, { CreateProjectConfigurationProps } from "../../../core/domain/repository/configuration/iconfiguration_repository"
 import prisma from "../../service/prisma"
-import { Either, left, right } from "../../../core/utils/either"
+import { Either, left, right } from "../../../core/types/either"
 
 class ConfigurationRepository implements IConfigurationRepository{
   async createProjectConfiguration(props: CreateProjectConfigurationProps): Promise<Either<any, IProjectConfiguration>> {

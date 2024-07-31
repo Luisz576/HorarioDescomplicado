@@ -1,5 +1,5 @@
 import authenticator, { splitMarker } from "../../service/authenticator"
-import { Either, left, right } from "../../../core/utils/either"
+import { Either, left, right } from "../../../core/types/either"
 
 type AuthenticateTokenResponse = {
     token: string

@@ -123,8 +123,8 @@ async function run(){
       {
         id: 5,
         configuration: {
-          maxConsecutiveClasses: 2,
-          minConsecutiveClasses: 4,
+          maxConsecutiveClasses: 4,
+          minConsecutiveClasses: 2,
           preferMaxConsecutiveClasses: false
         },
         teacherId: 5
@@ -132,8 +132,8 @@ async function run(){
       {
         id: 6,
         configuration: {
-          maxConsecutiveClasses: 2,
-          minConsecutiveClasses: 3,
+          maxConsecutiveClasses: 3,
+          minConsecutiveClasses: 2,
           preferMaxConsecutiveClasses: false
         },
         teacherId: 4
@@ -141,8 +141,8 @@ async function run(){
       {
         id: 7,
         configuration: {
-          maxConsecutiveClasses: 2,
-          minConsecutiveClasses: 3,
+          maxConsecutiveClasses: 3,
+          minConsecutiveClasses: 2,
           preferMaxConsecutiveClasses: false
         },
         teacherId: 6
@@ -150,8 +150,8 @@ async function run(){
       {
         id: 8,
         configuration: {
-          maxConsecutiveClasses: 2,
-          minConsecutiveClasses: 4,
+          maxConsecutiveClasses: 4,
+          minConsecutiveClasses: 2,
           preferMaxConsecutiveClasses: false
         },
         teacherId: 7
@@ -159,8 +159,8 @@ async function run(){
       {
         id: 9,
         configuration: {
-          maxConsecutiveClasses: 2,
-          minConsecutiveClasses: 3,
+          maxConsecutiveClasses: 3,
+          minConsecutiveClasses: 2,
           preferMaxConsecutiveClasses: false
         },
         teacherId: 2
@@ -193,8 +193,8 @@ async function run(){
       }
     ]
   }, {
-    mutationRate: 0.1,
-    populationSize: 150,
+    mutationRate: 0.2,
+    populationSize: 300,
     randomIndividualSize: 0,
     rankSlice: 15,
     roundsOfRoulette: 1,
