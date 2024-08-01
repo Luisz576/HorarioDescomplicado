@@ -20,7 +20,7 @@ export default class ProjectController{
         data: res.value
       })
     }
-    return context.getResponse().sendStatus(400)
+    return context.getResponse().sendStatus(500)
   }
   async delete(context: IHttpContext){
     const { targetId } = context.getRequest().body
@@ -37,6 +37,6 @@ export default class ProjectController{
       }
       return context.getResponse().sendStatus(403)
     }
-    return context.getResponse().sendStatus(400)
+    return context.getResponse().sendStatus(500)
   }
 }

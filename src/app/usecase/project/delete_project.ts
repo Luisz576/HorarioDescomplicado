@@ -1,7 +1,7 @@
-import IProjectRepository from "../../../core/domain/repository/iproject_repository"
+import IProjectRepository from "../../../core/domain/contracts/repository/iproject_repository"
 import projectRepository from "../../repository/project_repository"
 import { Either, left, right } from "../../../core/types/either"
-import IConfigurationRepository from "../../../core/domain/repository/configuration/iconfiguration_repository"
+import IConfigurationRepository from "../../../core/domain/contracts/repository/configuration/iconfiguration_repository"
 import configurationRepository from "../../repository/configuration/configuration_repository"
 
 class DeleteProject{

@@ -1,5 +1,5 @@
-import { Either } from "../../utils/either"
-import IProject from "../model/iproject"
+import { Either } from "../../../types/either"
+import IProject from "../../model/iproject"
 
 export type CreateProjectProps = Omit<IProject, 'id'>
 
