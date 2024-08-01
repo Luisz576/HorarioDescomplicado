@@ -18,6 +18,9 @@ async function load_projects() {
   projects_element.innerHTML = ""
   try{
     const projects = await api.loadProjects()
+    projects.sort((a, b) => {
+      return a.name.localeCompare(b.name)
+    })
     for(let p in projects){
       projects_element.innerHTML += build_project_item(projects[p].name, projects[p].id)
     }
