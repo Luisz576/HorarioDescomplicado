@@ -4,6 +4,7 @@ import createProject from "../usecase/project/create_project";
 import deleteProject from "../usecase/project/delete_project";
 import getAllProjects from "../usecase/project/get_all_projects";
 import getProject from "../usecase/project/get_project";
+import updateProject from "../usecase/project/update_project";
 
 export default class ProjectController{
   constructor(
@@ -86,5 +87,31 @@ export default class ProjectController{
       return context.getResponse().sendStatus(403)
     }
     return context.getResponse().sendStatus(500)
+  }
+  async update(context: IHttpContext){
+    const targetId = context.getRequest().params.pid
+    if(!targetId || isNaN(Number(targetId))){
+      return context.getResponse().sendStatus(400)
+    }
+    const { auth_token } = context.getRequest().headers
+    const client = this.getClientName.execute(auth_token)
+    if(!client){
+      return context.getResponse().sendStatus(400)
+    }
+
+    const projectUpdate = context.getRequest().body
+    if(auth_token && projectUpdate){
+      const res = await updateProject.exec(Number(targetId), client, projectUpdate)
+      if(res.isRight()){
+        if(res.value){
+          return context.getResponse().json({
+            status: 200
+          })
+        }
+        return context.getResponse().sendStatus(401)
+      }
+      return context.getResponse().sendStatus(500)
+    }
+    return context.getResponse().sendStatus(400)
   }
 }

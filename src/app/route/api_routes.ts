@@ -28,5 +28,9 @@ routes.delete('/project/:pid', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return projectController.delete(adapter)
 })
+routes.patch('/project/:pid', (req, res, next) => {
+  const adapter = new ExpressAdapter(req, res, next)
+  return projectController.update(adapter)
+})
 
 export default routes

@@ -26,6 +26,14 @@ class Http{
       headers: headers
     })
   }
+  async patch(url, body={}, headers={}){
+    headers["Content-Type"] = "application/json"
+    return fetch(encodeURI(url), {
+      method: "PATCH",
+      body: JSON.stringify(body),
+      headers: headers
+    })
+  }
   // delete()
 }
 

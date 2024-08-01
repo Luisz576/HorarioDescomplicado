@@ -16,3 +16,13 @@ export interface FullIProject{
     geneticConfiguration: IGeneticConfiguration
   }
 }
+
+export type PartialFullIProject = Partial<{
+  id: number
+  name: string
+  configuration: Partial<{
+    preferFirstClasses: boolean,
+    id: number,
+    geneticConfiguration: Partial<IGeneticConfiguration>
+  }>
+}>

@@ -59,6 +59,7 @@ class ProjectData{
 var project
 var wasProjectModified = valueObject(false)
 var wasRankMethodSelected = valueObject(false)
+var isSaving = false
 
 const projectSaveIconElement = document.getElementById('project-save-icon-element')
 wasProjectModified.addListener((modified) => {
@@ -141,8 +142,12 @@ projectConfigRandomIndividualSize.onchange = function(event){
 const projectConfigPopSize = document.getElementById('project-config-pop-size')
 const popSizeValue = document.getElementById('pop-size-value')
 projectConfigPopSize.onchange = function(event){
-  popSizeValue.innerHTML = event.srcElement.value
-  project.configuration.geneticConfiguration.populationSize.set(event.srcElement.value)
+  if(isNaN(Number(event.srcElement.value))){
+    event.preventDefault()
+    return
+  }
+  popSizeValue.innerHTML = Number(event.srcElement.value)
+  project.configuration.geneticConfiguration.populationSize.set(Number(event.srcElement.value))
 
   const percentRandom = projectConfigRandomIndividualSize.value
   const popSize = project.configuration.geneticConfiguration.populationSize.get()
@@ -237,11 +242,19 @@ function go_to_projects_page(){
 }
 
 //// SAVE ////
-function save_project(){
-  wasProjectModified.set(false)
-  // TODO: send to api
-  console.warn("TODO: save")
-  console.log(project.toJson())
+async function save_project(){
+  if(isSaving){
+    return
+  }
+  isSaving = true
+  try{
+    await api.updateProject(project)
+    wasProjectModified.set(false)
+  }catch(e){
+    console.error(e)
+    alert("Erro ao salvar!")
+  }
+  isSaving = false
 }
 
 load_project()

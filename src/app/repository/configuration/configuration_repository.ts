@@ -3,6 +3,7 @@ import IProjectConfiguration from "../../../core/domain/model/configuration/ipro
 import IConfigurationRepository, { CreateProjectConfigurationProps } from "../../../core/domain/contracts/repository/configuration/iconfiguration_repository"
 import prisma from "../../service/prisma"
 import { Either, left, right } from "../../../core/types/either"
+import { PartialFullIProject } from "../../../core/domain/model/iproject"
 
 class ConfigurationRepository implements IConfigurationRepository{
   async createProjectConfiguration(props: CreateProjectConfigurationProps): Promise<Either<any, IProjectConfiguration>> {
@@ -35,32 +36,14 @@ class ConfigurationRepository implements IConfigurationRepository{
     }
   }
   async createSubjectConfiguration(): Promise<Either<any, string>> {
+    // ! Não podia estar em outro repository?
     throw new Error("Method not implemented.")
   }
   async deleteProjectConfiguration(targetId: number): Promise<Either<any, boolean>> {
-    // ! stop deleting and just set as deleted
-    try{
-      await prisma.configuration.delete({
-        where: {
-          id: targetId
-        }
-      })
-      return right(true)
-    }catch(e){
-      return left("couldn't delete project configuration: " + e)
-    }
+    throw new Error("Method not implemented.")
   }
   async deleteGeneticConfiguration(targetId: number): Promise<Either<any, boolean>> {
-    try{
-      await prisma.geneticConfiguration.delete({
-        where: {
-          id: targetId
-        }
-      })
-      return right(true)
-    }catch(e){
-      return left("couldn't delete genetic configuration: " + e)
-    }
+    throw new Error("Method not implemented.")
   }
   async deleteSubjectConfiguration(targetId: number): Promise<Either<any, boolean>> {
     throw new Error("Method not implemented.")
@@ -105,6 +88,31 @@ class ConfigurationRepository implements IConfigurationRepository{
   }
   async selectSubjectConfiguration(targetId: number): Promise<Either<any, any | null>>{
     throw new Error("Method not implemented.")
+  }
+  async updateProjectConfiguration(configurationId: number | undefined, geneticConfigurationId: number | undefined, toUpdate: PartialFullIProject): Promise<Either<any, boolean>>{
+    try{
+      if(configurationId){
+        await prisma.configuration.update({
+          data: {
+            preferFirstClasses: toUpdate.configuration?.preferFirstClasses
+          },
+          where: {
+            id: configurationId
+          }
+        })
+      }
+      if(geneticConfigurationId && toUpdate.configuration && toUpdate.configuration.geneticConfiguration){
+        await prisma.geneticConfiguration.update({
+          data: toUpdate.configuration.geneticConfiguration,
+          where: {
+            id: geneticConfigurationId
+          }
+        })
+      }
+      return right(true)
+    }catch(e){
+      return left(e)
+    }
   }
 }
 

@@ -42,6 +42,15 @@ class Api{
     throw Error("Error to load projects")
   }
 
+  async updateProject(projectData){
+    const pjson = projectData.toJson()
+    const res = await http.patch(this.#api_url + "/project/" + projectData.id, pjson, this.#authenticatedHeader())
+    if(res.status == 200){
+      return
+    }
+    throw Error("Error to save project")
+  }
+
   #authenticatedHeader(){
     return {
       "auth_token": this.#auth.authToken()
