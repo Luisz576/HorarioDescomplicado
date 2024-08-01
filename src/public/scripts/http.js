@@ -13,16 +13,17 @@ class Http{
       v = true
     }
     headers["Content-Type"] = "application/json"
-    return fetch(encodeURIComponent(url), {
+    return fetch(encodeURI(url), {
       method: "GET",
       headers: headers
     })
   }
   async post(url, body={}, headers={}){
     headers["Content-Type"] = "application/json"
-    return fetch(encodeURIComponent(url), {
+    return fetch(encodeURI(url), {
       method: "POST",
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      headers: headers
     })
   }
   // delete()

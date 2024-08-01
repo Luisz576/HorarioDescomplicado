@@ -1,6 +1,7 @@
 import auth_configs from '../config/auth_config.json'
 import jwt from 'jsonwebtoken'
 import sha256 from 'crypto-js/sha256'
+import AuthenticateToken from '../usecase/auth/authenticate_token'
 
 interface AllowedClient{
   name: string,
@@ -12,6 +13,28 @@ const DEFAULT_TOKEN_TIME = 86400
 export const splitMarker = '._.'
 
 export default {
+  async generateAplicationTokenByToken(auth_token: AuthenticateToken,token: string, expiresIn?: number): Promise<string | undefined>{
+    let client_id
+    await auth_token.auth_id({
+      token: token,
+      callback(result) {
+        if(result.isRight()){
+          client_id = result.value
+          return
+        }
+        client_id = null
+      },
+    })
+    if(client_id && client_id != null){
+      const client = this.getClientById(client_id)
+      if(client){
+        const expires: number = expiresIn ? expiresIn : DEFAULT_TOKEN_TIME
+        const generated_token = `${client.id}${splitMarker}${this.generateJWTToken({ secret: client.secret }, expires)}`
+        return generated_token
+      }
+    }
+    return undefined
+  },
   async generateAplicationTokenByClientSecret(client_secret: string, expiresIn?: number): Promise<string | undefined>{
     let client
     for(let i in auth_configs.clients){

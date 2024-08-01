@@ -9,5 +9,9 @@ routes.post('/login', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return authController.login(adapter)
 })
+routes.post('/login/token', (req, res, next) => {
+  const adapter = new ExpressAdapter(req, res, next)
+  return authController.loginWithToken(adapter)
+})
 
 export default routes

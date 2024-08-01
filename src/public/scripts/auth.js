@@ -1,5 +1,6 @@
 class AuthManager{
   #cookieManager = new CookieManager()
+  #authApiUrl = "http://127.0.0.1:5000/api/auth"
   #authTokenKey = 'auth_token'
   #authToken = undefined
   #authenticating = false
@@ -7,13 +8,18 @@ class AuthManager{
     this.#authenticating = true
     const recoveredAuthToken = this.#cookieManager.get(this.#authTokenKey)
     if(recoveredAuthToken){
-      // TODO: validar token
-      // await ...
-      if(true){
-        // logado
-        this.#authToken = recoveredAuthToken
+      const response = await http.post(this.#authApiUrl + "/login/token", {}, {
+        "auth_token": recoveredAuthToken
+      })
+      if(response.status == 200){
+        const newAuthToken = (await response.json()).token
+        if(newAuthToken){
+          this.#cookieManager.set(this.#authTokenKey, newAuthToken)
+          this.#authToken = newAuthToken
+        }else{
+          this.#authToken = recoveredAuthToken
+        }
       }else{
-        this.#cookieManager.remove(this.#authTokenKey)
         this.#authToken = undefined
       }
     }
