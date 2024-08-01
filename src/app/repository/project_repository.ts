@@ -33,6 +33,7 @@ class ProjectRepository implements IProjectRepository{
     }
   }
   async delete(targetId: number): Promise<Either<any, Boolean>>{
+    // ! stop deleting and just set as deleted
     try{
       await prisma.project.delete({
         where: {

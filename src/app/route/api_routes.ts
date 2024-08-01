@@ -12,11 +12,19 @@ routes.use((req, res, next) => {
 })
 
 const projectController = projectControllerFactory()
+routes.get('/projects', (req, res, next) => {
+  const adapter = new ExpressAdapter(req, res, next)
+  return projectController.show(adapter)
+})
+routes.get('/project/:pid', (req, res, next) => {
+  const adapter = new ExpressAdapter(req, res, next)
+  return projectController.get(adapter)
+})
 routes.post('/project', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return projectController.create(adapter)
 })
-routes.delete('/project', (req, res, next) => {
+routes.delete('/project/:pid', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return projectController.delete(adapter)
 })
