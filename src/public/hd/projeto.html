@@ -10,16 +10,88 @@
   <body>
     <header class="m-0 bg-green-950">
       <div class="px-12 py-5 flex justify-items-stretch">
-        <h1 class="flex-1 text-white text-2xl font-bold">Horário Descomplicado</h1>
+        <div class="flex">
+          <span class="text-white font-bold text-2xl hover:text-zinc-400 hover:cursor-pointer" onclick="go_to_projects_page()">&#60;</span>
+          <h1 class="ml-2 text-white text-2xl font-bold">Horário Descomplicado</h1>
+        </div>
         <div class="flex flex-1 justify-end">
-          <button class="text-white font-bold text-lg hover:text-zinc-300" onclick="_logout()">Logout</button>
+          <button class="text-white font-bold text-lg hover:text-zinc-300" onclick="_logout_auth()">Logout</button>
         </div>
       </div>
     </header>
 
     <section>
       <div class="mx-28 my-16">
-        <h2 class="font-bold text-xl underline">Projeto</h2>
+        <div class="flex">
+          <h2 class="font-bold text-xl underline">Projeto</h2>
+          <div class="ml-2" style="visibility: hidden;" id="project-save-icon-element">
+            <div class="hover:cursor-pointer" onclick="save_project()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="mt-4" id="project-area" style="display: none;">
+            <div>
+              <div>
+                <span class="font-bold">Nome:</span>
+                <input type="text" name="name" id="project-name">
+              </div>
+              <div class="mt-2">
+                <h4 class="font-bold underline">Configurações</h4>
+                <div class="ml-4">
+                  <div class="mt-2">
+                    <span class="font-bold mt-2">Prefere primeiras aulas</span>
+                    <input class="size-3" type="checkbox" id="project-config-preffer-first-classes">
+                  </div>
+                  <div class="mt-2">
+                    <span class="font-bold mt-2">Método de seleção</span>
+                    <select name="selection-method" id="project-config-selection-method">
+                      <option value="0">Rank</option>
+                      <option value="1">Competição</option>
+                    </select>
+                  </div>
+                  <div class="mt-2" style="visibility: hidden;" id="rank-slice-config">
+                    <span class="font-bold mt-2">Preservação dos melhores:</span>
+                    <input min="0" max="100" type="range" id="project-config-rank-slice">
+                    <span id="rank-slice-value"></span>
+                  </div>
+                  <div class="mt-2">
+                    <span class="font-bold mt-2">Método de parada</span>
+                    <select name="stop-method" id="project-config-stop-method">
+                      <option value="0">Número máximo de gerações</option>
+                      <option value="1">Número de gerações sem novo melhor</option>
+                    </select>
+                  </div>
+                  <div class="mt-2">
+                    <span class="font-bold">Número máximo de gerações / Número de gerações sem novo melhor:</span>
+                    <input type="number" min="1" max="10000" id="project-max-generation">
+                  </div>
+                  <div class="mt-2">
+                    <p class="font-bold">Tamanho da população:</p>
+                    <input min="1" max="1000" type="range" id="project-config-pop-size">
+                    <span id="pop-size-value"></span>
+                  </div>
+                  <div class="mt-2">
+                    <p class="font-bold">Variedade genética:</p>
+                    <input min="0" max="100" type="range" id="project-config-random-individual-size">
+                    <span id="random-individual-size-value"></span>
+                  </div>
+                  <div class="mt-2">
+                    <p class="font-bold">Taxa de mutação:</p>
+                    <input min="0" max="100" type="range" id="project-config-mutation-ratio">
+                    <span id="mutation-ratio-value"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="project-message">
+            <span>Carregando projeto...</span>
+          </div>
+        </div>
       </div>
     </section>
 
