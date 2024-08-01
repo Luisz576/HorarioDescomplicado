@@ -5,19 +5,8 @@ class Api{
     this.#auth = auth
   }
 
-  async ensureIsAuthenticated(ms = 2000, c=5){
-    let count = 0
-    while(count < c && this.#auth.isAuthenticating()){
-      count++
-      await sleep(ms/c)
-    }
-    if(!this.#auth.isAuthenticated()){
-      throw Error("Not Authenticated")
-    }
-  }
-
   async createProject(projectName){
-    await this.ensureIsAuthenticated()
+    await this.#auth.ensureIsAuthenticated()
 
     const res = await http.post(this.#api_url + "/project", {
       "name": projectName
@@ -30,7 +19,7 @@ class Api{
   }
 
   async loadProject(id){
-    await this.ensureIsAuthenticated()
+    await this.#auth.ensureIsAuthenticated()
 
     const res = await http.get(this.#api_url + "/project/" + id, {}, this.#authenticatedHeader())
 
@@ -42,7 +31,7 @@ class Api{
   }
 
   async loadProjects(){
-    await this.ensureIsAuthenticated()
+    await this.#auth.ensureIsAuthenticated()
 
     const res = await http.get(this.#api_url + "/projects", {}, this.#authenticatedHeader())
 

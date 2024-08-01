@@ -7,23 +7,57 @@
         <link rel="stylesheet" href="./styles/tailwind.css">
         <link rel="stylesheet" href="./styles/styles.css">
     </head>
-    <body>
-        <header>
-          <h1>Horário Descomplicado</h1>
+    <body class="min-h-max bg-zinc-50">
+        <header class="m-0 bg-green-950">
+          <div class="px-12 py-5">
+            <h1 class="text-white text-2xl font-bold">Horário Descomplicado</h1>
+          </div>
         </header>
 
-        <section>
-          <div></div>
+        <section class="my-52">
+          <div class="flex w-full justify-center">
+            <div class="border-2 border-zinc-800" id="login-form-area">
+              <div class="mx-20 my-8">
+                <h1 class="font-bold text-2xl">Login</h1>
+                <div class="mt-4">
+                  <div>
+                    <div>
+                      <label for="username">Usuário</label>
+                    </div>
+                    <div>
+                      <input class="border-2 px-2 py-1 border-zinc-800 bg-zinc-200" type="text" name="username" id="username" maxlength="20" minlength="3">
+                    </div>
+                  </div>
+                  <div class="mt-2">
+                    <div>
+                      <label for="password">Senha</label>
+                    </div>
+                    <div>
+                      <input class="border-2 px-2 py-1 border-zinc-800 bg-zinc-200" type="password" name="password" id="password" maxlength="20" minlength="3">
+                    </div>
+                  </div>
+                  <div class="mt-2">
+                    <button class="px-6 py-2 bg-green-700 text-white font-bold" type="submit" onclick="_index_login_button_handler()">Login</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <footer>
-            <h3>Criado por: Luisz576</h3>
+        <footer class="fixed bottom-0 w-full border-t-2 border-cyan-950">
+          <div class="my-4 mx-8">
+            <h3>Criado por: Luisz576 ©2024</h3>
+          </div>
         </footer>
+
+        <!-- SCRIPTS -->
         <script src="./scripts/functions.js"></script>
         <script src="./scripts/http.js"></script>
         <script src="./scripts/cookie_manager.js"></script>
-        <script src="./scripts/auth.js"></script>
-        <script src="./scripts/api/api.js"></script>
+        <script src="./scripts/auth/auth.js"></script>
+        <script src="./scripts/auth/logged_area.js"></script>
+
         <script src="./scripts/pages/index.js"></script>
     </body>
 </html>
