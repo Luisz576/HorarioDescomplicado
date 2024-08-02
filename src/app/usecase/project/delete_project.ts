@@ -25,10 +25,10 @@ class DeleteProject{
 
           if(resProjectConfiguration.isRight()){
             if(resProjectConfiguration.value != null){
-              await this.projectRepository.delete(targetId)
-              await this.configurationRepository.deleteProjectConfiguration(resProject.value.configurationId)
-              await this.configurationRepository.deleteGeneticConfiguration(resProjectConfiguration.value.geneticConfigurationId)
-              return right(true)
+              const resA = await this.projectRepository.delete(targetId)
+              const resB = await this.configurationRepository.deleteProjectConfiguration(resProject.value.configurationId)
+              const resC = await this.configurationRepository.deleteGeneticConfiguration(resProjectConfiguration.value.geneticConfigurationId)
+              return right(resA.isRight() && resB.isRight() && resC.isRight())
             }
           }else{
             return left(resProjectConfiguration.value)

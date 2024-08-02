@@ -30,6 +30,14 @@ class Api{
     throw Error("Error to load project")
   }
 
+  async deleteProject(projectId){
+    const res = await http.delete(this.#api_url + "/project/" + projectId, {}, this.#authenticatedHeader())
+    if(res.status == 200){
+      return
+    }
+    throw Error("Error to delete project")
+  }
+
   async loadProjects(){
     await this.#auth.ensureIsAuthenticated()
 

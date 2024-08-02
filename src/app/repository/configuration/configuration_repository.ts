@@ -40,13 +40,40 @@ class ConfigurationRepository implements IConfigurationRepository{
     throw new Error("Method not implemented.")
   }
   async deleteProjectConfiguration(targetId: number): Promise<Either<any, boolean>> {
-    throw new Error("Method not implemented.")
+    try{
+      await prisma.configuration.delete({
+        where: {
+          id: targetId
+        }
+      })
+      return right(true)
+    }catch(e){
+      return left("couldn't delete project: " + e)
+    }
   }
   async deleteGeneticConfiguration(targetId: number): Promise<Either<any, boolean>> {
-    throw new Error("Method not implemented.")
+    try{
+      await prisma.geneticConfiguration.delete({
+        where: {
+          id: targetId
+        }
+      })
+      return right(true)
+    }catch(e){
+      return left("couldn't delete project: " + e)
+    }
   }
   async deleteSubjectConfiguration(targetId: number): Promise<Either<any, boolean>> {
-    throw new Error("Method not implemented.")
+    try{
+      await prisma.subject.delete({
+        where: {
+          id: targetId
+        }
+      })
+      return right(true)
+    }catch(e){
+      return left("couldn't delete project: " + e)
+    }
   }
   async selectProjectConfiguration(targetId: number): Promise<Either<any, IProjectConfiguration | null>>{
     try{
@@ -91,10 +118,10 @@ class ConfigurationRepository implements IConfigurationRepository{
   }
   async updateProjectConfiguration(configurationId: number | undefined, geneticConfigurationId: number | undefined, toUpdate: PartialFullIProject): Promise<Either<any, boolean>>{
     try{
-      if(configurationId){
+      if(configurationId && toUpdate.configuration){
         await prisma.configuration.update({
           data: {
-            preferFirstClasses: toUpdate.configuration?.preferFirstClasses
+            preferFirstClasses: toUpdate.configuration.preferFirstClasses
           },
           where: {
             id: configurationId
@@ -102,8 +129,9 @@ class ConfigurationRepository implements IConfigurationRepository{
         })
       }
       if(geneticConfigurationId && toUpdate.configuration && toUpdate.configuration.geneticConfiguration){
+        const geneticConfiguration = toUpdate.configuration.geneticConfiguration
         await prisma.geneticConfiguration.update({
-          data: toUpdate.configuration.geneticConfiguration,
+          data: geneticConfiguration,
           where: {
             id: geneticConfigurationId
           }
@@ -111,6 +139,7 @@ class ConfigurationRepository implements IConfigurationRepository{
       }
       return right(true)
     }catch(e){
+      console.error(e)
       return left(e)
     }
   }

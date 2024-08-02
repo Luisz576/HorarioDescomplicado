@@ -115,10 +115,10 @@ const projectConfigStopMethod = document.getElementById('project-config-stop-met
 projectConfigStopMethod.onchange = function(event){
   switch(event.srcElement.value){
     case "0":
-      project.configuration.geneticConfiguration.selectionMethod.set("MAX_GENERATIONS")
+      project.configuration.geneticConfiguration.stopMethod.set("MAX_GENERATIONS")
       return
     case "1":
-      project.configuration.geneticConfiguration.selectionMethod.set("GENERATIONS_WITHOUT_BETTER_SCORE")
+      project.configuration.geneticConfiguration.stopMethod.set("GENERATIONS_WITHOUT_BETTER_SCORE")
       return
   }
 }
@@ -159,7 +159,11 @@ projectConfigPopSize.onchange = function(event){
 
 const projectConfigMaxGeneration = document.getElementById('project-max-generation')
 projectConfigMaxGeneration.onchange = function(event){
-  project.configuration.geneticConfiguration.maxOrWithoutBetterGenerations.set(event.srcElement.value)
+  if(isNaN(Number(event.srcElement.value))){
+    event.preventDefault()
+    return
+  }
+  project.configuration.geneticConfiguration.maxOrWithoutBetterGenerations.set(Number(event.srcElement.value))
 }
 /////////////////////////
 
@@ -183,12 +187,12 @@ function render_project(){
   popSizeValue.innerHTML = popSize
 
   const randomindividuals = project.configuration.geneticConfiguration.randomIndividualSize.get()
-  const randomIndividualPercent = Math.floor(randomindividuals / popSize)
+  const randomIndividualPercent = Math.floor((randomindividuals / popSize) * 100)
   projectConfigRandomIndividualSize.value = randomIndividualPercent
   randomIndividualSizeValue.innerHTML = randomIndividualPercent.toString() + "%"
 
   const sliceRank = project.configuration.geneticConfiguration.rankSlice.get()
-  const sliceRankPercent = Math.floor(sliceRank / popSize)
+  const sliceRankPercent = Math.floor((sliceRank / popSize) * 100)
   projectConfigRankSlice.value = sliceRankPercent
   rankSliceValue.innerHTML = sliceRankPercent.toString() + "%"
 }
@@ -258,3 +262,29 @@ async function save_project(){
 }
 
 load_project()
+
+const deleteProjectModel = document.getElementById('delete-project-model')
+function delete_project_model(){
+  if(deleteProjectModel.style.display == "none"){
+    deleteProjectModel.style.display = ""
+  }else{
+    deleteProjectModel.style.display = "none"
+  }
+}
+
+var deleting = false
+async function delete_project(){
+  if(deleting){
+    return
+  }
+  deleting = true
+  try{
+    await api.deleteProject(project.id)
+    delete_project_model()
+    go_to_projects_page()
+  }catch(e){
+    console.error(e)
+    alert("Não foi possível deletar o projeto!")
+  }
+  deleting = false
+}

@@ -34,4 +34,37 @@ async function load_projects() {
   }
 }
 
+const newProjectName = document.getElementById('new-project-name')
+var creating = false
+async function create_new_project(){
+  if(creating){
+    return
+  }
+  creating = true
+  if(newProjectName.value.trim().length > 3){
+    try{
+      await api.createProject(newProjectName.value.trim())
+      newProjectName.value = ""
+      new_project_modal()
+      load_projects()
+    }catch(e){
+      console.error(e)
+      alert("Erro ao criar")
+    }
+    creating = false
+    return
+  }
+  creating = false
+  alert("Nome inválido")
+}
+
+const newProjectModal = document.getElementById('new-project-modal')
+function new_project_modal(){
+  if(newProjectModal.style.display == "none"){
+    newProjectModal.style.display = ""
+  }else{
+    newProjectModal.style.display = "none"
+  }
+}
+
 load_projects()

@@ -34,7 +34,14 @@ class Http{
       headers: headers
     })
   }
-  // delete()
+  async delete(url, body={}, headers={}){
+    headers["Content-Type"] = "application/json"
+    return fetch(encodeURI(url), {
+      method: "DELETE",
+      body: JSON.stringify(body),
+      headers: headers
+    })
+  }
 }
 
 const http = new Http()

@@ -12,8 +12,14 @@ class UpdateProject{
   ){}
   async exec(targetId: number, client: string, update: Partial<FullIProject>): Promise<Either<any, boolean>>{
     if(targetId > 0){
+      const rProject = await this.projectRepository.selectFirst({
+        id: targetId
+      })
+      if(rProject.isRight() && rProject.value && rProject.value.ownerId != client){
+        return right(false)
+      }
       if(update.name){
-        const resProject = await projectRepository.update(targetId, {
+        const resProject = await this.projectRepository.update(targetId, {
           name: update.name
         })
         if(!(resProject.isRight() && resProject.value)){
@@ -21,9 +27,6 @@ class UpdateProject{
         }
       }
       if(update.configuration){
-        const rProject = await projectRepository.selectFirst({
-          id: targetId
-        })
         if(!(rProject.isRight() && rProject.value != null)){
           return right(false)
         }
