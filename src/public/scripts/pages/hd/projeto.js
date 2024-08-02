@@ -237,6 +237,7 @@ async function load_project(){
         render_error("Projeto não encontrado!")
       }
       await load_teachers()
+      await load_classrooms()
     }catch(e){
       render_error(e)
     }
@@ -291,7 +292,7 @@ async function delete_project(){
   deleting = false
 }
 
-// teachers
+//// teachers ////
 var wasTeacherModified = valueObject(false)
 const teachers = []
 
@@ -315,7 +316,7 @@ function teacher_item_change_handler(index){
 function build_teacher_item(index, teacher){
   return `<div>
     <button class="mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_teacher(${index})">-</button>
-    <input class="ml-2" type="text" name="teacher" onchange="teacher_item_change_handler(${index})" id="teacher-list-${index}" value="${teacher.name}">
+    <input class="ml-2" type="text" onchange="teacher_item_change_handler(${index})" id="teacher-list-${index}" value="${teacher.name}">
   </div>`
 }
 
@@ -395,3 +396,177 @@ function _teachers_show_or_hide(){
 }
 
 load_project()
+
+//// Subjects ////
+var wasSubjectModified = valueObject(false)
+var subjectsVisible = false
+const subjects = []
+
+const subjectListElement = document.getElementById('subjects-list')
+const subjectSaveIconElement = document.getElementById('subject-save-icon-element')
+const subjectOpenedElement = document.getElementById('subject-opened')
+const subjectClosedElement = document.getElementById('subject-closed')
+
+wasSubjectModified.addListener((modified) => {
+  if(modified){
+    subjectSaveIconElement.style = ""
+  }else{
+    subjectSaveIconElement.style = "display: none"
+  }
+})
+
+function add_new_subject(){
+  subjects.push({
+    name: "Nova Sala",
+    acceptedSubjects: []
+  })
+  wasSubjectModified.set(true)
+  render_subjects()
+}
+
+function remove_subject(index){
+  subjects.splice(index, 1)
+  wasSubjectModified.set(true)
+  render_subjects()
+}
+
+function _subjects_show_or_hide(){
+  if(subjectsVisible){
+    subjectListElement.style = "display: none;"
+    subjectOpenedElement.style = "display: none;"
+    subjectClosedElement.style = ""
+  }else{
+    subjectListElement.style = ""
+    subjectOpenedElement.style = ""
+    subjectClosedElement.style = "display: none;"
+  }
+  subjectsVisible = !subjectsVisible
+}
+
+function subject_name_item_change_handler(index){
+  const s = document.getElementById('subject-list-' + index)
+  if(s.value.trim().length > 2){
+    subjects[index].name = s.value.trim()
+    wasSubjectModified.set(true)
+  }
+  render_subjects()
+}
+
+function build_subject_item(index, subject){
+  return `<div>
+    <button class="mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_subject(${index})">-</button>
+    <input class="ml-2" type="text" onchange="subject_name_item_change_handler(${index})" id="subject-list-${index}" value="${subject.name}">
+  </div>`
+}
+
+function render_subjects(){
+  if(errorInLoading){
+    return
+  }
+  subjectListElement.innerHTML = ""
+  if(subjects.length > 0){
+    for(let i in subjects){
+      subjectListElement.innerHTML += build_subject_item(i, subjects[i])
+    }
+  }else{
+    subjectListElement.innerHTML = `<p class="mt-2">Nenhuma matéria cadastrada!</p>`
+  }
+}
+
+function load_subjects(){
+  // TODO
+  render_subjects()
+}
+
+function save_subjects(){
+  // TODO
+}
+
+load_subjects()
+
+//// Classrooms ////
+var wasClassroomModified = valueObject(false)
+var classroomsVisible = false
+const classrooms = []
+
+const classroomsListElement = document.getElementById('classrooms-list')
+const classroomSaveIconElement = document.getElementById('classroom-save-icon-element')
+const classroomsOpenedElement = document.getElementById('classrooms-opened')
+const classroomsClosedElement = document.getElementById('classrooms-closed')
+
+wasClassroomModified.addListener((modified) => {
+  if(modified){
+    classroomSaveIconElement.style = ""
+  }else{
+    classroomSaveIconElement.style = "display: none"
+  }
+})
+
+function add_new_classroom(){
+  classrooms.push({
+    name: "Nova Sala",
+    acceptedSubjects: []
+  })
+  wasClassroomModified.set(true)
+  render_classrooms()
+}
+
+function remove_classroom(index){
+  classrooms.splice(index, 1)
+  wasClassroomModified.set(true)
+  render_classrooms()
+}
+
+function _classrooms_show_or_hide(){
+  if(classroomsVisible){
+    classroomsListElement.style = "display: none;"
+    classroomsOpenedElement.style = "display: none;"
+    classroomsClosedElement.style = ""
+  }else{
+    classroomsListElement.style = ""
+    classroomsOpenedElement.style = ""
+    classroomsClosedElement.style = "display: none;"
+  }
+  classroomsVisible = !classroomsVisible
+}
+
+function classroom_name_item_change_handler(index){
+  const c = document.getElementById('classroom-list-' + index)
+  if(c.value.trim().length > 2){
+    classrooms[index].name = c.value.trim()
+    wasClassroomModified.set(true)
+  }
+  render_classrooms()
+}
+
+function build_classroom_item(index, classroom){
+  return `<div>
+    <button class="mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_classroom(${index})">-</button>
+    <input class="ml-2" type="text" onchange="classroom_name_item_change_handler(${index})" id="classroom-list-${index}" value="${classroom.name}">
+  </div>`
+}
+
+function render_classrooms(){
+  if(errorInLoading){
+    return
+  }
+  classroomsListElement.innerHTML = ""
+  if(classrooms.length > 0){
+    for(let i in classrooms){
+      classroomsListElement.innerHTML += build_classroom_item(i, classrooms[i])
+    }
+  }else{
+    classroomsListElement.innerHTML = `<p class="mt-2">Nenhuma sala cadastrada!</p>`
+  }
+}
+
+function load_classrooms(){
+  // TODO
+  render_classrooms()
+}
+
+function save_classrooms(){
+  // TODO
+}
+
+load_classrooms()
