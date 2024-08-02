@@ -18,7 +18,7 @@ export default class GetTeachers{
         }
         return resTeachers
       }else{
-        right([])
+        return right([])
       }
     }
     return left(isPO.value)

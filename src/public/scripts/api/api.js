@@ -81,10 +81,12 @@ class Api{
   async updateTeachers(projectId, teachers){
     await this.#auth.ensureIsAuthenticated()
 
-    const res = await http.patch(this.#api_url + "/project/" + projectId + "/teachers", {}, this.#authenticatedHeader())
+    const res = await http.patch(this.#api_url + "/project/" + projectId + "/teachers", {
+      teachers: teachers
+    }, this.#authenticatedHeader())
 
     if(res.status == 200){
-      return
+      return true
     }
     throw Error("Error to save teachers")
   }

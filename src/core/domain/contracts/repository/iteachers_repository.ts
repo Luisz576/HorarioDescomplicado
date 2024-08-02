@@ -1,7 +1,9 @@
 import { Either } from "../../../types/either"
 import ITeacher from "../../model/iteacher"
 
-export type CreateTeacherProps = Omit<ITeacher, 'id'>
+export type CreateTeacherProps = Omit<ITeacher, 'id'> & {
+  projectId: number
+}
 
 export type SearchTeacherQuery = Partial<ITeacher>
 

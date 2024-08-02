@@ -21,7 +21,7 @@
     </header>
 
     <section>
-      <div class="mx-28 my-16">
+      <div class="mx-28 mt-16 mb-24">
         <div class="flex">
           <button class="hover:cursor-pointer" onclick="delete_project_model()">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="size-5" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -94,10 +94,23 @@
             </div>
             <div class="mt-2">
               <h4 class="font-bold underline">Dados</h4>
+              <!-- PROFESSORES -->
               <div class="ml-4">
                 <div class="mt-2">
                   <div class="flex">
-                    <span class="font-bold mt-2">Professores</span>
+                    <div class="flex hover:cursor-pointer" onclick="_teachers_show_or_hide()">
+                      <div class="mt-2 flex justify-center items-center" id="teachers-closed">
+                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                        </svg>
+                      </div>
+                      <div class="mt-2 flex justify-center items-center" id="teachers-opened" style="display: none;">
+                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                        </svg>
+                      </div>
+                      <span class="font-bold mt-2 ml-2">Professores</span>
+                    </div>
                     <button class="ml-2 mt-2 bg-green-600 text-white size-6" type="button" onclick="add_new_teacher()">+</button>
                     <div class="ml-4 mt-2" style="visibility: hidden;" id="teachers-save-icon-element">
                       <div class="hover:cursor-pointer" onclick="save_teachers()">
@@ -107,8 +120,16 @@
                       </div>
                     </div>
                   </div>
-                  <div class="ml-4" id="teachers-list"></div>
+                  <div class="ml-6" id="teachers-list" style="display: none;"></div>
                 </div>
+              </div>
+              <!-- TODO: Matérias -->
+              <div class="ml-4">
+
+              </div>
+              <!-- TODO: Salas -->
+              <div class="ml-4">
+
               </div>
             </div>
           </div>

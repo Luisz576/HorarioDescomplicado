@@ -30,7 +30,7 @@ class ProjectData{
   removeListener(listener){
     const i = this.#listeners.find(listener)
     if(i != undefined){
-      this.#listeners.splice(i, i)
+      this.#listeners.splice(i, 1)
     }
   }
   toJson(){
@@ -108,7 +108,7 @@ const projectConfigRankSlice = document.getElementById('project-config-rank-slic
 const rankSliceValue = document.getElementById('rank-slice-value')
 projectConfigRankSlice.onchange = function(event){
   rankSliceValue.innerHTML = event.srcElement.value + "%"
-  const percent = event.srcElement.value
+  const percent = Number(event.srcElement.value)
   const popSize = project.configuration.geneticConfiguration.populationSize.get()
   project.configuration.geneticConfiguration.rankSlice.set(Math.floor(popSize * (percent / 100)))
 }
@@ -144,6 +144,7 @@ projectConfigRandomIndividualSize.onchange = function(event){
 const projectConfigPopSize = document.getElementById('project-config-pop-size')
 const popSizeValue = document.getElementById('pop-size-value')
 projectConfigPopSize.onchange = function(event){
+  // ! O VALOR ESTÁ FICANDO ERRADO!
   if(isNaN(Number(event.srcElement.value))){
     event.preventDefault()
     return
@@ -155,7 +156,7 @@ projectConfigPopSize.onchange = function(event){
   const popSize = project.configuration.geneticConfiguration.populationSize.get()
   project.configuration.geneticConfiguration.randomIndividualSize.set(Math.floor(popSize * (percentRandom / 100)))
 
-  const percentRank = project.configuration.geneticConfiguration.rankSlice.get()
+  const percentRank = Math.floor((project.configuration.geneticConfiguration.rankSlice.get() / popSize) * 100)
   project.configuration.geneticConfiguration.rankSlice.set(Math.floor(popSize * (percentRank / 100)))
 }
 
@@ -298,6 +299,7 @@ async function delete_project(){
 
 // teachers
 var wasTeacherModified = valueObject(false)
+const teachers = []
 
 const teacherSaveIconElement = document.getElementById('teachers-save-icon-element')
 wasTeacherModified.addListener((modified) => {
@@ -309,37 +311,48 @@ wasTeacherModified.addListener((modified) => {
 })
 
 function teacher_item_change_handler(index){
-  // TODO:
-  console.log("Change")
+  const t = document.getElementById('teacher-list-' + index)
+  if(t.value.trim().length > 2){
+    teachers[index].name = t.value.trim()
+  }
+  render_teachers()
 }
 
 function build_teacher_item(index, teacher){
   return `<div>
     <button class="mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_teacher(${index})">-</button>
-    <input class="ml-2" type="text" name="teacher" onchange="teacher_item_change_handler(${index})" value="${teacher.name}">
+    <input class="ml-2" type="text" name="teacher" onchange="teacher_item_change_handler(${index})" id="teacher-list-${index}" value="${teacher.name}">
   </div>`
 }
 
 function remove_teacher(index){
-  // TODO:
-  console.log("Remove")
+  teachers.splice(index, 1)
+  render_teachers()
 }
 
-var teachers = []
 const teachersListElement = document.getElementById('teachers-list')
 function render_teachers(){
   if(errorInLoading){
     return
   }
   teachersListElement.innerHTML = ""
-  for(let i in teachers){
-    teachersListElement.innerHTML += build_teacher_item(i, teachers[i])
+  if(teachers.length > 0){
+    for(let i in teachers){
+      teachersListElement.innerHTML += build_teacher_item(i, teachers[i])
+    }
+  }else{
+    teachersListElement.innerHTML = `<p class="mt-2">Nenhum professor cadastrado!</p>`
   }
 }
 
 async function load_teachers(){
   try{
-    teachers = await api.loadTeachers(projectId)
+    while(teachers.length > 0){ teachers.pop() }
+    const tData = await api.loadTeachers(projectId)
+    for(let i in tData){
+      teachers.push(tData[i])
+    }
+    render_teachers()
   }catch(e){
     console.error(e)
     render_error("Não foi possível carregar os professores!")
@@ -363,12 +376,28 @@ async function save_teachers(){
   try{
     await api.updateTeachers(projectId, teachers)
     wasTeacherModified.set(false)
-    load_teachers()
+    await load_teachers()
   }catch(e){
     console.error(e)
     alert("Erro ao salvar professores!")
   }
   savingTeachers = false
+}
+
+var isTeachersOpen = false
+const teachersOpened = document.getElementById('teachers-opened')
+const teachersClosed = document.getElementById('teachers-closed')
+function _teachers_show_or_hide(){
+  if(isTeachersOpen){
+    teachersListElement.style = "display: none;"
+    teachersOpened.style = "display: none;"
+    teachersClosed.style = ""
+  }else{
+    teachersListElement.style = ""
+    teachersOpened.style = ""
+    teachersClosed.style = "display: none;"
+  }
+  isTeachersOpen = !isTeachersOpen
 }
 
 load_project()

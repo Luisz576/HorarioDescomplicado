@@ -193,14 +193,14 @@ async function run(){
       }
     ]
   }, {
-    mutationRate: 0.2,
-    populationSize: 300,
-    randomIndividualSize: 0,
+    mutationRate: 0.1,
+    populationSize: 350,
+    randomIndividualSize: 5,
     rankSlice: 15,
     roundsOfRoulette: 1,
     selectionMethod: "RANK",
     stopMethod: 'GENERATIONS_WITHOUT_BETTER_SCORE',
-    maxOrWithoutBetterGenerations: 200,
+    maxOrWithoutBetterGenerations: 250,
   })
 
   await g.evolve((generation) => {

@@ -39,5 +39,9 @@ routes.get('/project/:pid/teachers', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return teachersController.show(adapter)
 })
+routes.patch('/project/:pid/teachers', (req, res, next) => {
+  const adapter = new ExpressAdapter(req, res, next)
+  return teachersController.storeAndUpdate(adapter)
+})
 
 export default routes
