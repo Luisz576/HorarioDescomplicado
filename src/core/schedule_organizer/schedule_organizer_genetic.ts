@@ -141,7 +141,7 @@ export default class ScheduleOrganizerGenetic{
     return X
   }
   #mutatePhenotype(phenotype: ScheduleOrganizerPhenotype): ScheduleOrganizerPhenotype{
-    if(Math.random() < 0.4){
+    if(Math.random() < 0.5){
       return this.#changeBlockOfTime(phenotype, phenotype)
     }else{
       let x = Math.floor(Math.random() * 4) + 1
