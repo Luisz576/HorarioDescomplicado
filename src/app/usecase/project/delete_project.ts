@@ -3,11 +3,14 @@ import projectRepository from "../../repository/project_repository"
 import { Either, left, right } from "../../../core/types/either"
 import IConfigurationRepository from "../../../core/domain/contracts/repository/configuration/iconfiguration_repository"
 import configurationRepository from "../../repository/configuration/configuration_repository"
+import ITeachersRepository from "../../../core/domain/contracts/repository/iteachers_repository"
+import teachersRepository from "../../repository/teachers_repository"
 
 class DeleteProject{
   constructor(
     private projectRepository: IProjectRepository,
-    private configurationRepository: IConfigurationRepository
+    private configurationRepository: IConfigurationRepository,
+    private teachersRepository: ITeachersRepository
   ){}
   async exec(targetId: number, owner: string | undefined): Promise<Either<any, boolean>>{
     if(targetId && targetId > 0 && owner && owner.trim() != ""){
@@ -28,7 +31,13 @@ class DeleteProject{
               const resA = await this.projectRepository.delete(targetId)
               const resB = await this.configurationRepository.deleteProjectConfiguration(resProject.value.configurationId)
               const resC = await this.configurationRepository.deleteGeneticConfiguration(resProjectConfiguration.value.geneticConfigurationId)
-              return right(resA.isRight() && resB.isRight() && resC.isRight())
+              const resD = await this.teachersRepository.deleteAllFromProject(targetId)
+              return right(
+                resA.isRight()
+                && resB.isRight()
+                && resC.isRight()
+                && resD.isRight()
+              )
             }
           }else{
             return left(resProjectConfiguration.value)
@@ -44,6 +53,7 @@ class DeleteProject{
 
 const deleteProject = new DeleteProject(
   projectRepository,
-  configurationRepository
+  configurationRepository,
+  teachersRepository
 )
 export default deleteProject

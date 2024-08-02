@@ -10,15 +10,17 @@ export default function teachersControllerFactory(){
   const isProjectOwner = new IsProjectOwner(
     projectRepository
   )
+  const getTeachers = new GetTeachers(
+    isProjectOwner,
+    teachersRepository
+  )
   return new TeachersController(
     new GetClientName(),
-    new GetTeachers(
-      isProjectOwner,
-      teachersRepository
-    ),
+    getTeachers,
     new CreateAndUpdateTeachers(
       isProjectOwner,
-      teachersRepository
+      teachersRepository,
+      getTeachers
     )
   )
 }

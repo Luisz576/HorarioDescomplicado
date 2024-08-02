@@ -322,6 +322,7 @@ function build_teacher_item(index, teacher){
 
 function remove_teacher(index){
   teachers.splice(index, 1)
+  wasTeacherModified.set(true)
   render_teachers()
 }
 
