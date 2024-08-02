@@ -107,10 +107,13 @@ projectConfigSelectionMethod.onchange = function(event){
 const projectConfigRankSlice = document.getElementById('project-config-rank-slice')
 const rankSliceValue = document.getElementById('rank-slice-value')
 projectConfigRankSlice.onchange = function(event){
-  rankSliceValue.innerHTML = event.srcElement.value + "%"
-  const percent = Number(event.srcElement.value)
-  const popSize = project.configuration.geneticConfiguration.populationSize.get()
-  project.configuration.geneticConfiguration.rankSlice.set(Math.floor(popSize * (percent / 100)))
+  const v = Number(event.srcElement.value)
+  if(isNaN(v)){
+    event.preventDefault()
+    return
+  }
+  rankSliceValue.innerHTML = `${v}%`
+  project.configuration.geneticConfiguration.rankSlice.set(v)
 }
 
 const projectConfigStopMethod = document.getElementById('project-config-stop-method')
@@ -135,29 +138,24 @@ projectConfigMutationRatio.onchange = function(event){
 const projectConfigRandomIndividualSize = document.getElementById('project-config-random-individual-size')
 const randomIndividualSizeValue = document.getElementById('random-individual-size-value')
 projectConfigRandomIndividualSize.onchange = function(event){
-  randomIndividualSizeValue.innerHTML = event.srcElement.value + "%"
-  const percent = event.srcElement.value
-  const popSize = project.configuration.geneticConfiguration.populationSize.get()
-  project.configuration.geneticConfiguration.randomIndividualSize.set(Math.floor(popSize * (percent / 100)))
+  const v = Number(event.srcElement.value)
+  if(isNaN(v)){
+    event.preventDefault()
+    return
+  }
+  randomIndividualSizeValue.innerHTML = v.toString() + "%"
+  project.configuration.geneticConfiguration.randomIndividualSize.set(v)
 }
 
 const projectConfigPopSize = document.getElementById('project-config-pop-size')
 const popSizeValue = document.getElementById('pop-size-value')
 projectConfigPopSize.onchange = function(event){
-  // ! O VALOR ESTÁ FICANDO ERRADO!
   if(isNaN(Number(event.srcElement.value))){
     event.preventDefault()
     return
   }
   popSizeValue.innerHTML = Number(event.srcElement.value)
   project.configuration.geneticConfiguration.populationSize.set(Number(event.srcElement.value))
-
-  const percentRandom = projectConfigRandomIndividualSize.value
-  const popSize = project.configuration.geneticConfiguration.populationSize.get()
-  project.configuration.geneticConfiguration.randomIndividualSize.set(Math.floor(popSize * (percentRandom / 100)))
-
-  const percentRank = Math.floor((project.configuration.geneticConfiguration.rankSlice.get() / popSize) * 100)
-  project.configuration.geneticConfiguration.rankSlice.set(Math.floor(popSize * (percentRank / 100)))
 }
 
 const projectConfigMaxGeneration = document.getElementById('project-max-generation')
@@ -192,15 +190,11 @@ function render_project(){
   projectConfigPopSize.value = popSize
   popSizeValue.innerHTML = popSize
 
-  const randomindividuals = project.configuration.geneticConfiguration.randomIndividualSize.get()
-  const randomIndividualPercent = Math.floor((randomindividuals / popSize) * 100)
-  projectConfigRandomIndividualSize.value = randomIndividualPercent
-  randomIndividualSizeValue.innerHTML = randomIndividualPercent.toString() + "%"
+  projectConfigRandomIndividualSize.value = project.configuration.geneticConfiguration.randomIndividualSize.get()
+  randomIndividualSizeValue.innerHTML =  project.configuration.geneticConfiguration.randomIndividualSize.get().toString() + "%"
 
-  const sliceRank = project.configuration.geneticConfiguration.rankSlice.get()
-  const sliceRankPercent = Math.floor((sliceRank / popSize) * 100)
-  projectConfigRankSlice.value = sliceRankPercent
-  rankSliceValue.innerHTML = sliceRankPercent.toString() + "%"
+  projectConfigRankSlice.value = project.configuration.geneticConfiguration.rankSlice.get()
+  rankSliceValue.innerHTML = project.configuration.geneticConfiguration.rankSlice.get().toString() + "%"
 }
 
 function _on_change_handler(){

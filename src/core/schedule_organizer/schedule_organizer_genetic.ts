@@ -74,11 +74,14 @@ export default class ScheduleOrganizerGenetic{
     this.#phenotypeProps = phenotypeProps
     this.#stopMethod = geneticConfiguration.stopMethod
     this.#maxOrWithoutBetterGenerations = geneticConfiguration.maxOrWithoutBetterGenerations
+
+    const randomIndividualSize = Math.floor(geneticConfiguration.populationSize * (geneticConfiguration.randomIndividualSize / 100))
+    const rankSlice = Math.floor(geneticConfiguration.populationSize * (geneticConfiguration.rankSlice / 100))
     this.#g = new Genetic<ScheduleOrganizerPhenotype>({
       mutationRate: geneticConfiguration.mutationRate,
       populationSize: geneticConfiguration.populationSize,
-      randomIndividualSize: geneticConfiguration.randomIndividualSize,
-      rankSlice: geneticConfiguration.rankSlice,
+      randomIndividualSize: randomIndividualSize,
+      rankSlice: rankSlice,
       selectionMethod: geneticConfiguration.selectionMethod
     }, {
       crossover: this.#crossover.bind(this),

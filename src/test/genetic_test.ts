@@ -195,8 +195,8 @@ async function run(){
   }, {
     mutationRate: 0.1,
     populationSize: 350,
-    randomIndividualSize: 5,
-    rankSlice: 15,
+    randomIndividualSize: 2,
+    rankSlice: 5,
     roundsOfRoulette: 1,
     selectionMethod: "RANK",
     stopMethod: 'GENERATIONS_WITHOUT_BETTER_SCORE',
