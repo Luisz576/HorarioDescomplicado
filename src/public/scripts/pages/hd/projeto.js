@@ -53,6 +53,8 @@ class ProjectData{
   }
 }
 
+var errorInLoading = false
+
 /**
  * @type ProjectData
  */
@@ -168,6 +170,9 @@ projectConfigMaxGeneration.onchange = function(event){
 /////////////////////////
 
 function render_project(){
+  if(errorInLoading){
+    return
+  }
   projectMessageElement.style = "display: none;"
   projectElement.style = ""
   // Content
@@ -202,15 +207,18 @@ function _on_change_handler(){
 }
 
 function render_error(e){
+  errorInLoading = true
   console.error(e)
+  projectMessageElement.style = ""
+  projectElement.style = "display: none;"
   projectMessageElement.innerHTML = `<span>${e}</span>`
 }
 
 ///////// LOAD ///////////
+var projectId
 async function load_project(){
   const querySearch = window.location.search.replace('?', '')
   const queries = querySearch.split('&')
-  let projectId
   for(let q in queries){
     query = queries[q].split('=', 2)
     if(query.length == 2){
@@ -233,6 +241,7 @@ async function load_project(){
       }else{
         render_error("Projeto não encontrado!")
       }
+      await load_teachers()
     }catch(e){
       render_error(e)
     }
@@ -261,8 +270,6 @@ async function save_project(){
   isSaving = false
 }
 
-load_project()
-
 const deleteProjectModel = document.getElementById('delete-project-model')
 function delete_project_model(){
   if(deleteProjectModel.style.display == "none"){
@@ -288,3 +295,80 @@ async function delete_project(){
   }
   deleting = false
 }
+
+// teachers
+var wasTeacherModified = valueObject(false)
+
+const teacherSaveIconElement = document.getElementById('teachers-save-icon-element')
+wasTeacherModified.addListener((modified) => {
+  if(modified){
+    teacherSaveIconElement.style = ""
+  }else{
+    teacherSaveIconElement.style = "display: none;"
+  }
+})
+
+function teacher_item_change_handler(index){
+  // TODO:
+  console.log("Change")
+}
+
+function build_teacher_item(index, teacher){
+  return `<div>
+    <button class="mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_teacher(${index})">-</button>
+    <input class="ml-2" type="text" name="teacher" onchange="teacher_item_change_handler(${index})" value="${teacher.name}">
+  </div>`
+}
+
+function remove_teacher(index){
+  // TODO:
+  console.log("Remove")
+}
+
+var teachers = []
+const teachersListElement = document.getElementById('teachers-list')
+function render_teachers(){
+  if(errorInLoading){
+    return
+  }
+  teachersListElement.innerHTML = ""
+  for(let i in teachers){
+    teachersListElement.innerHTML += build_teacher_item(i, teachers[i])
+  }
+}
+
+async function load_teachers(){
+  try{
+    teachers = await api.loadTeachers(projectId)
+  }catch(e){
+    console.error(e)
+    render_error("Não foi possível carregar os professores!")
+  }
+}
+
+function add_new_teacher(){
+  teachers.push({
+    name: "Novo Professor"
+  })
+  wasTeacherModified.set(true)
+  render_teachers()
+}
+
+var savingTeachers = false
+async function save_teachers(){
+  if(savingTeachers){
+    return
+  }
+  savingTeachers = true
+  try{
+    await api.updateTeachers(projectId, teachers)
+    wasTeacherModified.set(false)
+    load_teachers()
+  }catch(e){
+    console.error(e)
+    alert("Erro ao salvar professores!")
+  }
+  savingTeachers = false
+}
+
+load_project()

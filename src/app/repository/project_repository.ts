@@ -2,17 +2,14 @@ import IProject from "../../core/domain/model/iproject";
 import IProjectRepository, { CreateProjectProps, SearchProjectQuery } from "../../core/domain/contracts/repository/iproject_repository"
 import prisma from "../service/prisma";
 import { Either, left, right } from "../../core/types/either"
+import ProjectMapper from "../mapper/project_mapper";
 
 class ProjectRepository implements IProjectRepository{
   constructor(){}
   async create(props: CreateProjectProps): Promise<Either<any, IProject>> {
     try{
       const res = await prisma.project.create({
-        data: {
-          name: props.name,
-          ownerId: props.ownerId,
-          configurationId: props.configurationId
-        }
+        data: ProjectMapper.toPrisma(props)
       })
       return right(res)
     }catch(e){
@@ -22,7 +19,7 @@ class ProjectRepository implements IProjectRepository{
   async update(targetId: number, data: Partial<IProject>): Promise<Either<any, Boolean>> {
     try{
       await prisma.project.update({
-        data: data,
+        data: ProjectMapper.toPrismaPartial(data),
         where: {
           id: targetId
         }

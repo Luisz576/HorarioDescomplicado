@@ -129,9 +129,8 @@ class ConfigurationRepository implements IConfigurationRepository{
         })
       }
       if(geneticConfigurationId && toUpdate.configuration && toUpdate.configuration.geneticConfiguration){
-        const geneticConfiguration = toUpdate.configuration.geneticConfiguration
         await prisma.geneticConfiguration.update({
-          data: geneticConfiguration,
+          data: toUpdate.configuration.geneticConfiguration,
           where: {
             id: geneticConfigurationId
           }

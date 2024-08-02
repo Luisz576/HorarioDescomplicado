@@ -2,6 +2,7 @@ import { Router } from 'express'
 import authenticatorMiddlewareFactory from '../factory/middleware/authenticator_middleware_factory'
 import ExpressAdapter from '../adapter/express_adapter'
 import projectControllerFactory from '../factory/controller/project_controller_factory'
+import teachersControllerFactory from '../factory/controller/teachers_controller_factory'
 
 const routes = Router()
 
@@ -31,6 +32,12 @@ routes.delete('/project/:pid', (req, res, next) => {
 routes.patch('/project/:pid', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
   return projectController.update(adapter)
+})
+
+const teachersController = teachersControllerFactory()
+routes.get('/project/:pid/teachers', (req, res, next) => {
+  const adapter = new ExpressAdapter(req, res, next)
+  return teachersController.show(adapter)
 })
 
 export default routes
