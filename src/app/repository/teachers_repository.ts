@@ -39,7 +39,14 @@ class TeachersRepository implements ITeachersRepository{
           id: targetId
         }
       })
-      // !!!!!! TODO: remove from subject
+      await prisma.subject.updateMany({
+        data: {
+          teacherId: null
+        },
+        where: {
+          teacherId: targetId
+        }
+      })
       return right(true)
     }catch(e){
       return left(e)
@@ -52,7 +59,14 @@ class TeachersRepository implements ITeachersRepository{
           projectId: projectId
         }
       })
-      // !!!!!! TODO: remove from subject
+      await prisma.subject.updateMany({
+        data: {
+          teacherId: null
+        },
+        where: {
+          projectId: projectId
+        }
+      })
       return right(true)
     }catch(e){
       return left(e)

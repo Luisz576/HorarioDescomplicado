@@ -42,6 +42,13 @@ class Http{
       headers: headers
     })
   }
+  async head(url, headers={}){
+    headers["Content-Type"] = "application/json"
+    return fetch(encodeURI(url), {
+      method: "HEAD",
+      headers: headers
+    })
+  }
 }
 
 const http = new Http()

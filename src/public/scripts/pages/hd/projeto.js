@@ -1,5 +1,40 @@
 logged_area_handler(true)
 
+//// VIEW ////
+const scheduleGenerateButtonEnabled = valueObject(false)
+const scheduleGenerateButtonLoading = valueObject(false)
+
+const scheduleViewElement = document.getElementById('schedule-view')
+const scheduleViewControllerElement = document.getElementById('schedule-view-controller')
+const scheduleGenerateButtonElement = document.getElementById('schedule-generate-button')
+scheduleGenerateButtonEnabled.addListener((enabled) => {
+  scheduleGenerateButtonElement.disabled = !enabled
+})
+scheduleGenerateButtonLoading.addListener((loading) => {
+  if(loading){
+    scheduleGenerateButtonElement.innerHTML = "......."
+    scheduleGenerateButtonElement.classList.remove('bg-green-600')
+    scheduleGenerateButtonElement.classList.remove('hover:bg-green-800')
+    scheduleGenerateButtonElement.classList.add('bg-green-950')
+  }else{
+    scheduleGenerateButtonElement.innerHTML = "Gerar"
+    scheduleGenerateButtonElement.classList.add('bg-green-600')
+    scheduleGenerateButtonElement.classList.add('hover:bg-green-800')
+    scheduleGenerateButtonElement.classList.remove('bg-green-950')
+  }
+})
+
+function schedule_generate_button_habler(){
+  if(errorInLoading || !scheduleGenerateButtonEnabled.get()){
+    return
+  }
+  scheduleGenerateButtonLoading.set(true)
+  console.warn("TODO: generate")
+  // TODO generate
+  scheduleGenerateButtonLoading.set(false)
+}
+
+//// CONFIGURATION ////
 class ProjectData{
   #listeners = []
   constructor(project){
@@ -204,6 +239,7 @@ function _on_change_handler(){
 }
 
 function render_error(e){
+  scheduleGenerateButtonEnabled.set(false)
   errorInLoading = true
   console.error(e)
   projectMessageElement.style = ""
@@ -241,6 +277,8 @@ async function load_project(){
       await load_teachers()
       await load_subjects()
       await load_classrooms()
+
+      scheduleGenerateButtonEnabled.set(true)
     }catch(e){
       render_error(e)
     }
@@ -354,7 +392,6 @@ async function load_teachers(){
     }
     render_teachers()
   }catch(e){
-    console.error(e)
     render_error("Não foi possível carregar os professores!")
   }
 }
@@ -464,21 +501,28 @@ function subject_name_item_change_handler(index){
 
 function subject_item_teacher_select_handler(index){
   const selectTeacher = document.getElementById(`subject-list-${index}-teacher`)
-  if(isNaN(Number(selectTeacher.value))){
+  let v = Number(selectTeacher.value)
+  if(isNaN(v)){
     return
   }
-  subjects[index].teacherId = Number(selectTeacher.value)
+  if(v == -1){
+    v = null
+  }
+  subjects[index].teacherId = v
   wasSubjectModified.set(true)
 }
 
 function build_subject_item(index, subject){
   function build_select(){
-    let component = `<select id="subject-list-${index}-teacher" onchange="subject_item_teacher_select_handler(${index})">`
+    let component = `<select class="ml-2 border-2 text-zinc-950" id="subject-list-${index}-teacher" onchange="subject_item_teacher_select_handler(${index})">`
 
-    const selectedTeacherId = subjects[index].teacherId ? subjects[index].teacherId : -999
+    const selectedTeacherId = subjects[index].teacherId ? subjects[index].teacherId : -1
+    if(selectedTeacherId == -1){
+      component += `<option class="text-zinc-950" value="-1" selected>--------</option>`
+    }
     for(let t in teachers){
       let isSelected = teachers[t].id == selectedTeacherId
-      component += `<option value="${teachers[t].id}" ${isSelected ? "selected" : ""}>${teachers[t].name}</option>`
+      component += `<option class="text-zinc-950" value="${teachers[t].id}" ${isSelected ? "selected" : ""}>${teachers[t].name}</option>`
     }
 
     component += `</select>`
@@ -514,7 +558,6 @@ async function load_subjects(){
     }
     render_subjects()
   }catch(e){
-    console.error(e)
     render_error("Não foi possível carregar as matérias!")
   }
 }

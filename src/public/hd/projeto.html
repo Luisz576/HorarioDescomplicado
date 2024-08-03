@@ -21,170 +21,185 @@
     </header>
 
     <section>
-      <div class="mx-28 mt-16 mb-24">
-        <div class="flex">
-          <button class="hover:cursor-pointer" onclick="delete_project_model()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="size-5" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-            </svg>
-          </button>
-          <h2 class="ml-2 font-bold text-xl underline">Projeto</h2>
-          <div class="ml-2" style="visibility: hidden;" id="project-save-icon-element">
-            <div class="hover:cursor-pointer" onclick="save_project()">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+      <div class="grid grid-cols-2 mt-16 mb-24">
+        <div class="ml-28 mr-8">
+          <div class="flex">
+            <button class="hover:cursor-pointer" onclick="delete_project_model()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="size-5" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
               </svg>
+            </button>
+            <h2 class="ml-2 font-bold text-xl underline">Projeto</h2>
+            <div class="ml-2" style="visibility: hidden;" id="project-save-icon-element">
+              <div class="hover:cursor-pointer" onclick="save_project()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="mt-4" id="project-area" style="display: none;">
+              <div>
+                <div>
+                  <span class="font-bold">Nome:</span>
+                  <input type="text" name="name" id="project-name">
+                </div>
+                <div class="mt-2">
+                  <h4 class="font-bold underline">Configurações</h4>
+                  <div class="ml-4">
+                    <div class="mt-2">
+                      <span class="font-bold mt-2">Prefere primeiras aulas</span>
+                      <input class="size-3" type="checkbox" id="project-config-preffer-first-classes">
+                    </div>
+                    <div class="mt-2">
+                      <span class="font-bold mt-2">Método de seleção</span>
+                      <select name="selection-method" id="project-config-selection-method">
+                        <option value="0">Rank</option>
+                        <option value="1">Competição</option>
+                      </select>
+                    </div>
+                    <div class="mt-2" style="visibility: hidden;" id="rank-slice-config">
+                      <span class="font-bold mt-2">Preservação dos melhores:</span>
+                      <input min="0" max="100" type="range" id="project-config-rank-slice">
+                      <span id="rank-slice-value"></span>
+                    </div>
+                    <div class="mt-2">
+                      <span class="font-bold mt-2">Método de parada</span>
+                      <select name="stop-method" id="project-config-stop-method">
+                        <option value="0">Número máximo de gerações</option>
+                        <option value="1">Número de gerações sem novo melhor</option>
+                      </select>
+                    </div>
+                    <div class="mt-2">
+                      <span class="font-bold">Número máximo de gerações / Número de gerações sem novo melhor:</span>
+                      <input type="number" min="1" max="10000" id="project-max-generation">
+                    </div>
+                    <div class="mt-2">
+                      <p class="font-bold">Tamanho da população:</p>
+                      <input min="1" max="1000" type="range" id="project-config-pop-size">
+                      <span id="pop-size-value"></span>
+                    </div>
+                    <div class="mt-2">
+                      <p class="font-bold">Variedade genética:</p>
+                      <input min="0" max="100" type="range" id="project-config-random-individual-size">
+                      <span id="random-individual-size-value"></span>
+                    </div>
+                    <div class="mt-2">
+                      <p class="font-bold">Taxa de mutação:</p>
+                      <input min="0" max="100" type="range" id="project-config-mutation-ratio">
+                      <span id="mutation-ratio-value"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-2">
+                <h4 class="font-bold underline">Dados</h4>
+                <!-- Professores -->
+                <div class="ml-4">
+                  <div class="mt-2">
+                    <div class="flex">
+                      <div class="flex hover:cursor-pointer" onclick="_teachers_show_or_hide()">
+                        <div class="mt-2 flex justify-center items-center" id="teachers-closed">
+                          <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                          </svg>
+                        </div>
+                        <div class="mt-2 flex justify-center items-center" id="teachers-opened" style="display: none;">
+                          <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                          </svg>
+                        </div>
+                        <span class="font-bold mt-2 ml-2">Professores</span>
+                      </div>
+                      <button class="ml-2 mt-2 bg-green-600 text-white size-6" type="button" onclick="add_new_teacher()">+</button>
+                      <div class="ml-4 mt-2" style="visibility: hidden;" id="teachers-save-icon-element">
+                        <div class="hover:cursor-pointer" onclick="save_teachers()">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ml-6" id="teachers-list" style="display: none;"></div>
+                  </div>
+                </div>
+                <!-- Matérias -->
+                <div class="ml-4">
+                  <div class="mt-2">
+                    <div class="flex">
+                      <div class="flex hover:cursor-pointer" onclick="_subjects_show_or_hide()">
+                        <div class="mt-2 flex justify-center items-center" id="subject-closed">
+                          <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                          </svg>
+                        </div>
+                        <div class="mt-2 flex justify-center items-center" id="subject-opened" style="display: none;">
+                          <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                          </svg>
+                        </div>
+                        <span class="font-bold mt-2 ml-2">Matérias</span>
+                      </div>
+                      <button class="ml-2 mt-2 bg-green-600 text-white size-6" type="button" onclick="add_new_subject()">+</button>
+                      <div class="ml-4 mt-2" style="visibility: hidden;" id="subject-save-icon-element">
+                        <div class="hover:cursor-pointer" onclick="save_subject()">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ml-6" id="subjects-list" style="display: none;"></div>
+                  </div>
+                </div>
+                <!-- Salas -->
+                <div class="ml-4">
+                  <div class="mt-2">
+                    <div class="flex">
+                      <div class="flex hover:cursor-pointer" onclick="_classrooms_show_or_hide()">
+                        <div class="mt-2 flex justify-center items-center" id="classrooms-closed">
+                          <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                          </svg>
+                        </div>
+                        <div class="mt-2 flex justify-center items-center" id="classrooms-opened" style="display: none;">
+                          <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+                          </svg>
+                        </div>
+                        <span class="font-bold mt-2 ml-2">Salas</span>
+                      </div>
+                      <button class="ml-2 mt-2 bg-green-600 text-white size-6" type="button" onclick="add_new_classroom()">+</button>
+                      <div class="ml-4 mt-2" style="visibility: hidden;" id="classroom-save-icon-element">
+                        <div class="hover:cursor-pointer" onclick="save_classroom()">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ml-6" id="classrooms-list" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="project-message">
+              <span>Carregando...</span>
             </div>
           </div>
         </div>
         <div>
-          <div class="mt-4" id="project-area" style="display: none;">
-            <div>
-              <div>
-                <span class="font-bold">Nome:</span>
-                <input type="text" name="name" id="project-name">
-              </div>
-              <div class="mt-2">
-                <h4 class="font-bold underline">Configurações</h4>
-                <div class="ml-4">
-                  <div class="mt-2">
-                    <span class="font-bold mt-2">Prefere primeiras aulas</span>
-                    <input class="size-3" type="checkbox" id="project-config-preffer-first-classes">
-                  </div>
-                  <div class="mt-2">
-                    <span class="font-bold mt-2">Método de seleção</span>
-                    <select name="selection-method" id="project-config-selection-method">
-                      <option value="0">Rank</option>
-                      <option value="1">Competição</option>
-                    </select>
-                  </div>
-                  <div class="mt-2" style="visibility: hidden;" id="rank-slice-config">
-                    <span class="font-bold mt-2">Preservação dos melhores:</span>
-                    <input min="0" max="100" type="range" id="project-config-rank-slice">
-                    <span id="rank-slice-value"></span>
-                  </div>
-                  <div class="mt-2">
-                    <span class="font-bold mt-2">Método de parada</span>
-                    <select name="stop-method" id="project-config-stop-method">
-                      <option value="0">Número máximo de gerações</option>
-                      <option value="1">Número de gerações sem novo melhor</option>
-                    </select>
-                  </div>
-                  <div class="mt-2">
-                    <span class="font-bold">Número máximo de gerações / Número de gerações sem novo melhor:</span>
-                    <input type="number" min="1" max="10000" id="project-max-generation">
-                  </div>
-                  <div class="mt-2">
-                    <p class="font-bold">Tamanho da população:</p>
-                    <input min="1" max="1000" type="range" id="project-config-pop-size">
-                    <span id="pop-size-value"></span>
-                  </div>
-                  <div class="mt-2">
-                    <p class="font-bold">Variedade genética:</p>
-                    <input min="0" max="100" type="range" id="project-config-random-individual-size">
-                    <span id="random-individual-size-value"></span>
-                  </div>
-                  <div class="mt-2">
-                    <p class="font-bold">Taxa de mutação:</p>
-                    <input min="0" max="100" type="range" id="project-config-mutation-ratio">
-                    <span id="mutation-ratio-value"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="mt-2">
-              <h4 class="font-bold underline">Dados</h4>
-              <!-- Professores -->
-              <div class="ml-4">
-                <div class="mt-2">
-                  <div class="flex">
-                    <div class="flex hover:cursor-pointer" onclick="_teachers_show_or_hide()">
-                      <div class="mt-2 flex justify-center items-center" id="teachers-closed">
-                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                        </svg>
-                      </div>
-                      <div class="mt-2 flex justify-center items-center" id="teachers-opened" style="display: none;">
-                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-                        </svg>
-                      </div>
-                      <span class="font-bold mt-2 ml-2">Professores</span>
-                    </div>
-                    <button class="ml-2 mt-2 bg-green-600 text-white size-6" type="button" onclick="add_new_teacher()">+</button>
-                    <div class="ml-4 mt-2" style="visibility: hidden;" id="teachers-save-icon-element">
-                      <div class="hover:cursor-pointer" onclick="save_teachers()">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="ml-6" id="teachers-list" style="display: none;"></div>
-                </div>
-              </div>
-              <!-- Matérias -->
-              <div class="ml-4">
-                <div class="mt-2">
-                  <div class="flex">
-                    <div class="flex hover:cursor-pointer" onclick="_subjects_show_or_hide()">
-                      <div class="mt-2 flex justify-center items-center" id="subject-closed">
-                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                        </svg>
-                      </div>
-                      <div class="mt-2 flex justify-center items-center" id="subject-opened" style="display: none;">
-                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-                        </svg>
-                      </div>
-                      <span class="font-bold mt-2 ml-2">Matérias</span>
-                    </div>
-                    <button class="ml-2 mt-2 bg-green-600 text-white size-6" type="button" onclick="add_new_subject()">+</button>
-                    <div class="ml-4 mt-2" style="visibility: hidden;" id="subject-save-icon-element">
-                      <div class="hover:cursor-pointer" onclick="save_subject()">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="ml-6" id="subjects-list" style="display: none;"></div>
-                </div>
-              </div>
-              <!-- Salas -->
-              <div class="ml-4">
-                <div class="mt-2">
-                  <div class="flex">
-                    <div class="flex hover:cursor-pointer" onclick="_classrooms_show_or_hide()">
-                      <div class="mt-2 flex justify-center items-center" id="classrooms-closed">
-                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                        </svg>
-                      </div>
-                      <div class="mt-2 flex justify-center items-center" id="classrooms-opened" style="display: none;">
-                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-                        </svg>
-                      </div>
-                      <span class="font-bold mt-2 ml-2">Salas</span>
-                    </div>
-                    <button class="ml-2 mt-2 bg-green-600 text-white size-6" type="button" onclick="add_new_classroom()">+</button>
-                    <div class="ml-4 mt-2" style="visibility: hidden;" id="classroom-save-icon-element">
-                      <div class="hover:cursor-pointer" onclick="save_classroom()">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="ml-6" id="classrooms-list" style="display: none;"></div>
-                </div>
-              </div>
-            </div>
+          <div>
+            <h2 class="text-zinc-950 underline font-bold text-xl">Visualização</h2>
           </div>
-          <div id="project-message">
-            <span>Carregando...</span>
+          <div class="mt-4">
+            <!-- TODO -->
+            <div id="schedule-view"></div>
+            <!--------->
+            <div class="mt-4" id="schedule-view-controller">
+              <button class="bg-green-600 px-4 py-2 text-lg font-bold hover:bg-green-800 text-white disabled:bg-zinc-800" id="schedule-generate-button" onclick="schedule_generate_button_habler()" disabled>Gerar</button>
+            </div>
           </div>
         </div>
       </div>
@@ -229,6 +244,7 @@
     <script src="../scripts/auth/auth.js"></script>
     <script src="../scripts/auth/logged_area.js"></script>
     <script src="../scripts/api/api.js"></script>
+    <script src="../scripts/api/api_socket.js"></script>
 
     <script src="../scripts/pages/hd/projeto.js"></script>
   </body>
