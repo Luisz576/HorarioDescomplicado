@@ -428,8 +428,7 @@ wasSubjectModified.addListener((modified) => {
 
 function add_new_subject(){
   subjects.push({
-    name: "Nova Sala",
-    acceptedSubjects: []
+    name: "Nova Sala"
   })
   wasSubjectModified.set(true)
   render_subjects()
@@ -476,7 +475,7 @@ function build_subject_item(index, subject){
   function build_select(){
     let component = `<select id="subject-list-${index}-teacher" onchange="subject_item_teacher_select_handler(${index})">`
 
-    const selectedTeacherId = subjects[index].teacherId
+    const selectedTeacherId = subjects[index].teacherId ? subjects[index].teacherId : -999
     for(let t in teachers){
       let isSelected = teachers[t].id == selectedTeacherId
       component += `<option value="${teachers[t].id}" ${isSelected ? "selected" : ""}>${teachers[t].name}</option>`
