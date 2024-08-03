@@ -49,10 +49,11 @@ model Subject {
   name                   String
   configuration          SubjectConfiguration @relation(fields: [subjectConfigurationId], references: [id])
   subjectConfigurationId Int
-  teacher                Teacher              @relation(fields: [teacherId], references: [id])
-  teacherId              Int
+  teacher                Teacher?              @relation(fields: [teacherId], references: [id])
+  teacherId              Int?
+  Project   Project   @relation(fields: [projectId], references: [id])
+  projectId Int
   ClassroomSubject       ClassroomSubject[]
-  classroomId            Int?
 }
 
 model ClassroomSubject {
@@ -80,6 +81,7 @@ model Project {
   ownerId         String
   classrooms      Classroom[]
   teachers        Teacher[]
+  subjects        Subject[]
   configuration   Configuration @relation(fields: [configurationId], references: [id])
   configurationId Int
 

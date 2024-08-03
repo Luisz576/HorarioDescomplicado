@@ -78,11 +78,35 @@ class Api{
     throw Error("Error to load teachers")
   }
 
+  async loadSubjects(projectId){
+    await this.#auth.ensureIsAuthenticated()
+
+    const res = await http.get(this.#api_url + "/project/" + projectId + "/subjects", {}, this.#authenticatedHeader())
+
+    if(res.status == 200){
+      return (await res.json()).subjects
+    }
+    throw Error("Error to load subjects")
+  }
+
   async updateTeachers(projectId, teachers){
     await this.#auth.ensureIsAuthenticated()
 
-    const res = await http.patch(this.#api_url + "/project/" + projectId + "/teachers", {
+    const res = await http.patch(this.#api_url + "/project/" + projectId + "/teacher", {
       teachers: teachers
+    }, this.#authenticatedHeader())
+
+    if(res.status == 200){
+      return true
+    }
+    throw Error("Error to save teachers")
+  }
+
+  async updateSubjects(projectId, subjects){
+    await this.#auth.ensureIsAuthenticated()
+
+    const res = await http.patch(this.#api_url + "/project/" + projectId + "/subject", {
+      subjects: subjects
     }, this.#authenticatedHeader())
 
     if(res.status == 200){

@@ -1,3 +1,5 @@
+logged_area_handler(true)
+
 class ProjectData{
   #listeners = []
   constructor(project){
@@ -237,6 +239,7 @@ async function load_project(){
         render_error("Projeto não encontrado!")
       }
       await load_teachers()
+      await load_subjects()
       await load_classrooms()
     }catch(e){
       render_error(e)
@@ -309,6 +312,7 @@ function teacher_item_change_handler(index){
   const t = document.getElementById('teacher-list-' + index)
   if(t.value.trim().length > 2){
     teachers[index].name = t.value.trim()
+    wasTeacherModified.set(true)
   }
   render_teachers()
 }
@@ -408,6 +412,12 @@ const subjectSaveIconElement = document.getElementById('subject-save-icon-elemen
 const subjectOpenedElement = document.getElementById('subject-opened')
 const subjectClosedElement = document.getElementById('subject-closed')
 
+wasTeacherModified.addListener((modified) => {
+  if(modified){
+    render_subjects()
+  }
+})
+
 wasSubjectModified.addListener((modified) => {
   if(modified){
     subjectSaveIconElement.style = ""
@@ -453,10 +463,32 @@ function subject_name_item_change_handler(index){
   render_subjects()
 }
 
+function subject_item_teacher_select_handler(index){
+  const selectTeacher = document.getElementById(`subject-list-${index}-teacher`)
+  if(isNaN(Number(selectTeacher.value))){
+    return
+  }
+  subjects[index].teacherId = Number(selectTeacher.value)
+  wasSubjectModified.set(true)
+}
+
 function build_subject_item(index, subject){
+  function build_select(){
+    let component = `<select id="subject-list-${index}-teacher" onchange="subject_item_teacher_select_handler(${index})">`
+
+    const selectedTeacherId = subjects[index].teacherId
+    for(let t in teachers){
+      let isSelected = teachers[t].id == selectedTeacherId
+      component += `<option value="${teachers[t].id}" ${isSelected ? "selected" : ""}>${teachers[t].name}</option>`
+    }
+
+    component += `</select>`
+    return component
+  }
   return `<div>
     <button class="mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_subject(${index})">-</button>
     <input class="ml-2" type="text" onchange="subject_name_item_change_handler(${index})" id="subject-list-${index}" value="${subject.name}">
+    ${build_select()}
   </div>`
 }
 
@@ -474,13 +506,35 @@ function render_subjects(){
   }
 }
 
-function load_subjects(){
-  // TODO
-  render_subjects()
+async function load_subjects(){
+  try{
+    while(subjects.length > 0){ subjects.pop() }
+    const sData = await api.loadSubjects(projectId)
+    for(let i in sData){
+      subjects.push(sData[i])
+    }
+    render_subjects()
+  }catch(e){
+    console.error(e)
+    render_error("Não foi possível carregar as matérias!")
+  }
 }
 
-function save_subjects(){
-  // TODO
+var savingSubjects = false
+async function save_subject(){
+  if(savingSubjects){
+    return
+  }
+  savingSubjects = true
+  try{
+    await api.updateSubjects(projectId, subjects)
+    wasSubjectModified.set(false)
+    await load_subjects()
+  }catch(e){
+    console.error(e)
+    alert("Erro ao salvar materiais!")
+  }
+  savingSubjects = false
 }
 
 load_subjects()
@@ -561,12 +615,12 @@ function render_classrooms(){
   }
 }
 
-function load_classrooms(){
+async function load_classrooms(){
   // TODO
   render_classrooms()
 }
 
-function save_classrooms(){
+async function save_classrooms(){
   // TODO
 }
 

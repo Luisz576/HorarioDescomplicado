@@ -9,7 +9,7 @@
     "dev": "ts-node-dev --respawn --transpile-only ./src/server",
     "node": "node src/server",
     "prisma": "prisma generate",
-    "prisma-migrate": "prisma migrate dev",
+    "prisma-migrate": "prisma migrate dev --name",
     "test": "ts-node-dev --respawn --transpile-only ./src/test/genetic_test.ts",
     "tw": "npx tailwindcss -i ./src/tailwind_input.css -o ./src/public/styles/tailwind.css --watch"
   },

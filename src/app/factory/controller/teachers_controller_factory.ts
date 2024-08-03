@@ -1,4 +1,4 @@
-import TeachersController from "../../controller/teachers_controller";
+import TeacherController from "../../controller/teacher_controller";
 import projectRepository from "../../repository/project_repository";
 import teachersRepository from "../../repository/teachers_repository";
 import GetClientName from "../../usecase/auth/get_client_name";
@@ -14,7 +14,7 @@ export default function teachersControllerFactory(){
     isProjectOwner,
     teachersRepository
   )
-  return new TeachersController(
+  return new TeacherController(
     new GetClientName(),
     getTeachers,
     new CreateAndUpdateTeachers(
