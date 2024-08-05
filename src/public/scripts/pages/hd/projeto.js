@@ -656,6 +656,15 @@ function alreadyIncludesSubject(subjects, targetId){
   return false
 }
 
+function classroom_accepted_subject_item_classes_change_handler(index, indexInAcceptedSubject){
+  const classesItem = document.getElementById(`classroom-list-${index}-accepted-subject-${indexInAcceptedSubject}-classes`)
+  const classesValue = Number(classesItem.value)
+  if(!isNaN(classesValue) && classesValue > 0){
+    classrooms[index].acceptedSubjects[indexInAcceptedSubject].classes = classesValue
+    wasClassroomModified.set(true)
+  }
+}
+
 function remove_accepted_subject_item_handler(index, indexInAcceptedSubject){
   classrooms[index].acceptedSubjects.splice(indexInAcceptedSubject, 1)
   wasClassroomModified.set(true)
@@ -677,9 +686,10 @@ function build_classroom_item(index, classroom){
     function build_item_selected(indexInAcceptedSubject, remainingSubjects){
       const options = [] // opções que aparecem
       options.push({id: -1, name: "-----"})
-      const optionSelectedId = classrooms[index].acceptedSubjects[indexInAcceptedSubject].subjectId
+      const acceptedSubject = classrooms[index].acceptedSubjects[indexInAcceptedSubject]
+      const optionSelectedId = acceptedSubject.subjectId
       for(let o in remainingSubjects){
-        options.push(remainingSubjects[o]) // ! ESTÁ DUPLICADO
+        options.push(remainingSubjects[o])
       }
       if(optionSelectedId > 0){
         for(let i in subjects){
@@ -694,6 +704,7 @@ function build_classroom_item(index, classroom){
         item_selected += `<option value="${options[i].id}" ${options[i].id == optionSelectedId ? "selected" : ""}>${options[i].name}</option>`
       }
       item_selected += `</select>
+        <input class="ml-2 w-20" type="number" min="1" value="${acceptedSubject.classes}" onchange="classroom_accepted_subject_item_classes_change_handler(${index}, ${indexInAcceptedSubject})" id="classroom-list-${index}-accepted-subject-${indexInAcceptedSubject}-classes">
         <button class="ml-2 mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_accepted_subject_item_handler(${index}, ${indexInAcceptedSubject})">-</button>
         </div>`
       return item_selected
