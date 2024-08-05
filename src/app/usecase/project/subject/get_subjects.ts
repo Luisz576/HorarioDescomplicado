@@ -12,7 +12,9 @@ export default class GetSubjects{
     const isPO = await this.isProjectOwner.exec(Number(projectId), client)
     if(isPO.isRight()){
       if(isPO.value){
-        const resSubjects = await this.subjectRepository.selectAll(projectId)
+        const resSubjects = await this.subjectRepository.selectAll({
+          projectId: projectId
+        })
         if(resSubjects.isRight()){
           return right(resSubjects.value)
         }

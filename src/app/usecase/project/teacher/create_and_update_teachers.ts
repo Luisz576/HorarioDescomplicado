@@ -3,6 +3,7 @@ import ITeachersRepository from "../../../../core/domain/contracts/repository/it
 import IsProjectOwner from "../is_project_owner";
 import { Either, left, right } from "../../../../core/types/either";
 import GetTeachers from "./get_teachers";
+import { DeleteTeacherSubjects } from "../subject/delete_teacher_subjects";
 
 export type TeacherData = Omit<Teacher, 'id' | 'projectId'> & Partial<{id: number}>
 
@@ -11,6 +12,7 @@ export default class CreateAndUpdateTeachers{
     private isProjectOwner: IsProjectOwner,
     private teachersRepository: ITeachersRepository,
     private getTeachers: GetTeachers,
+    private deleteTeacherSubjects: DeleteTeacherSubjects
   ){}
   async exec(projectId: number, client: string, teachers: TeacherData[]) : Promise<Either<any, boolean>>{
     const isPO = await this.isProjectOwner.exec(Number(projectId), client)
@@ -39,6 +41,10 @@ export default class CreateAndUpdateTeachers{
               }
             }
             if(!teacherUpdated){
+              const resSubjectsRemove = await this.deleteTeacherSubjects.exec(savedTeachers[i].id, client)
+              if(resSubjectsRemove.isLeft()){
+                return left(resSubjectsRemove.value)
+              }
               const resRemove = await this.teachersRepository.delete(savedTeachers[i].id)
               if(resRemove.isLeft()){
                 return left(resRemove.value)

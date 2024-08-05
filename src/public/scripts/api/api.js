@@ -50,17 +50,6 @@ class Api{
     throw Error("Error to load projects")
   }
 
-  async updateProject(projectData){
-    await this.#auth.ensureIsAuthenticated()
-
-    const pjson = projectData.toJson()
-    const res = await http.patch(this.#api_url + "/project/" + projectData.id, pjson, this.#authenticatedHeader())
-    if(res.status == 200){
-      return
-    }
-    throw Error("Error to save project")
-  }
-
   #authenticatedHeader(){
     return {
       "auth_token": this.#auth.authToken()
@@ -89,6 +78,28 @@ class Api{
     throw Error("Error to load subjects")
   }
 
+  async loadClassrooms(projectId){
+    await this.#auth.ensureIsAuthenticated()
+
+    const res = await http.get(this.#api_url + "/project/" + projectId + "/classrooms", {}, this.#authenticatedHeader())
+
+    if(res.status == 200){
+      return (await res.json()).classrooms
+    }
+    throw Error("Error to load classrooms")
+  }
+
+  async updateProject(projectData){
+    await this.#auth.ensureIsAuthenticated()
+
+    const pjson = projectData.toJson()
+    const res = await http.patch(this.#api_url + "/project/" + projectData.id, pjson, this.#authenticatedHeader())
+    if(res.status == 200){
+      return
+    }
+    throw Error("Error to save project")
+  }
+
   async updateTeachers(projectId, teachers){
     await this.#auth.ensureIsAuthenticated()
 
@@ -105,14 +116,27 @@ class Api{
   async updateSubjects(projectId, subjects){
     await this.#auth.ensureIsAuthenticated()
 
-    const res = await http.patch(this.#api_url + "/project/" + projectId + "/subject", {
+    const res = await http.patch(this.#api_url + "/project/" + projectId + "/subjects", {
       subjects: subjects
     }, this.#authenticatedHeader())
 
     if(res.status == 200){
       return true
     }
-    throw Error("Error to save teachers")
+    throw Error("Error to save subjects")
+  }
+
+  async updateClassrooms(projectId, classrooms){
+    await this.#auth.ensureIsAuthenticated()
+
+    const res = await http.patch(this.#api_url + "/project/" + projectId + "/classrooms", {
+      classrooms: classrooms
+    }, this.#authenticatedHeader())
+
+    if(res.status == 200){
+      return true
+    }
+    throw Error("Error to save classrooms")
   }
 }
 

@@ -415,6 +415,8 @@ async function save_teachers(){
     await api.updateTeachers(projectId, teachers)
     wasTeacherModified.set(false)
     await load_teachers()
+    await load_subjects()
+    await load_classrooms()
   }catch(e){
     console.error(e)
     alert("Erro ao salvar professores!")
@@ -573,14 +575,13 @@ async function save_subject(){
     await api.updateSubjects(projectId, subjects)
     wasSubjectModified.set(false)
     await load_subjects()
+    await load_classrooms()
   }catch(e){
     console.error(e)
     alert("Erro ao salvar materiais!")
   }
   savingSubjects = false
 }
-
-load_subjects()
 
 //// Classrooms ////
 var wasClassroomModified = valueObject(false)
@@ -639,8 +640,20 @@ function classroom_name_item_change_handler(index){
 }
 
 function new_accepted_subject_item_handler(index){
-  classrooms[index].acceptedSubjects.push(-1)
+  classrooms[index].acceptedSubjects.push({
+    subjectId: -1,
+    classes: 1
+  })
   wasClassroomModified.set(true)
+}
+
+function alreadyIncludesSubject(subjects, targetId){
+  for(let s in subjects){
+    if(subjects[s].subjectId == targetId){
+      return true
+    }
+  }
+  return false
 }
 
 function remove_accepted_subject_item_handler(index, indexInAcceptedSubject){
@@ -652,7 +665,7 @@ function classroom_accepted_subject_item_change_handler(classroomIndex, indexInA
   const item = document.getElementById(`classroom-list-${classroomIndex}-accepted-subject-${indexInAcceptedSubject}`)
   const selectedValue = Number(item.value)
   if(!isNaN(selectedValue)){
-    classrooms[classroomIndex].acceptedSubjects[indexInAcceptedSubject] = selectedValue
+    classrooms[classroomIndex].acceptedSubjects[indexInAcceptedSubject].subjectId = selectedValue
   }
   wasClassroomModified.set(true)
 }
@@ -664,13 +677,13 @@ function build_classroom_item(index, classroom){
     function build_item_selected(indexInAcceptedSubject, remainingSubjects){
       const options = [] // opções que aparecem
       options.push({id: -1, name: "-----"})
-      const optionSelected = classrooms[index].acceptedSubjects[indexInAcceptedSubject]
+      const optionSelectedId = classrooms[index].acceptedSubjects[indexInAcceptedSubject].subjectId
       for(let o in remainingSubjects){
-        options.push(remainingSubjects[o])
+        options.push(remainingSubjects[o]) // ! ESTÁ DUPLICADO
       }
-      if(optionSelected > 0){
+      if(optionSelectedId > 0){
         for(let i in subjects){
-          if(subjects[i].id == optionSelected){
+          if(subjects[i].id == optionSelectedId){
             options.push(subjects[i])
             break
           }
@@ -678,7 +691,7 @@ function build_classroom_item(index, classroom){
       }
       let item_selected = `<div class="mt-2 flex"><select onchange="classroom_accepted_subject_item_change_handler(${index}, ${indexInAcceptedSubject})" id="classroom-list-${index}-accepted-subject-${indexInAcceptedSubject}">`
       for(let i in options){
-        item_selected += `<option value="${options[i].id}" ${options[i].id == optionSelected ? "selected" : ""}>${options[i].name}</option>`
+        item_selected += `<option value="${options[i].id}" ${options[i].id == optionSelectedId ? "selected" : ""}>${options[i].name}</option>`
       }
       item_selected += `</select>
         <button class="ml-2 mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_accepted_subject_item_handler(${index}, ${indexInAcceptedSubject})">-</button>
@@ -691,7 +704,7 @@ function build_classroom_item(index, classroom){
     for(let s in subjects){
       let currentSubjectId = Number(subjects[s].id)
       if(subjects[s].id && !isNaN(currentSubjectId)){
-        if(!classrooms[index].acceptedSubjects.includes(currentSubjectId)){
+        if(!alreadyIncludesSubject(classrooms[index].acceptedSubjects, currentSubjectId)){
           remainingSubjects.push({
             id: currentSubjectId,
             name: subjects[s].name
@@ -709,13 +722,13 @@ function build_classroom_item(index, classroom){
     }
 
     for(let askey in classrooms[index].acceptedSubjects){
-      let as = classrooms[index].acceptedSubjects[askey]
-      if(as == -1){
+      let asId = classrooms[index].acceptedSubjects[askey].subjectId
+      if(asId == -1){
         multiselect += `<div class="mt-2">${build_item_selected(askey, remainingSubjects)}</div>`
       }else{
         for(let s in subjects){
           let currentSubjectId = Number(subjects[s].id)
-          if(!isNaN(currentSubjectId) && currentSubjectId == as){
+          if(!isNaN(currentSubjectId) && currentSubjectId == asId){
             multiselect += build_item_selected(askey, remainingSubjects)
             break
           }
@@ -748,13 +761,34 @@ function render_classrooms(){
 }
 
 async function load_classrooms(){
-  // TODO
-  render_classrooms()
+  try{
+    while(classrooms.length > 0){ classrooms.pop() }
+    const cData = await api.loadClassrooms(projectId)
+    for(let i in cData){
+      classrooms.push(cData[i])
+    }
+    render_classrooms()
+  }catch(e){
+    render_error("Não foi possível carregar as salas!")
+  }
 }
 
+var savingClassrooms = false
 async function save_classrooms(){
-  // TODO
-  console.log(classrooms)
+  if(savingClassrooms){
+    return
+  }
+  savingClassrooms = true
+  try{
+    await api.updateClassrooms(projectId, classrooms)
+    wasClassroomModified.set(false)
+    await load_classrooms()
+  }catch(e){
+    console.error(e)
+    alert("Erro ao salvar Salas!")
+  }
+  savingClassrooms = false
 }
 
-load_classrooms()
+//// Avaliable Hours ////
+// ! TODO

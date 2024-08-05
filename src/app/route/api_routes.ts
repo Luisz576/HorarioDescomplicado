@@ -4,6 +4,7 @@ import ExpressAdapter from '../adapter/express_adapter'
 import projectControllerFactory from '../factory/controller/project_controller_factory'
 import teachersControllerFactory from '../factory/controller/teachers_controller_factory'
 import subjectControllerFactory from '../factory/controller/subject_controller_factory'
+import classroomsControllerFactory from '../factory/controller/classrooms_controller_factory'
 
 const routes = Router()
 
@@ -35,24 +36,34 @@ routes.patch('/project/:pid', (req, res, next) => {
   return projectController.update(adapter)
 })
 
-const teacherController = teachersControllerFactory()
+const teachersController = teachersControllerFactory()
 routes.get('/project/:pid/teachers', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
-  return teacherController.show(adapter)
+  return teachersController.show(adapter)
 })
 routes.patch('/project/:pid/teacher', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
-  return teacherController.storeAndUpdate(adapter)
+  return teachersController.storeAndUpdate(adapter)
 })
 
-const subjectController = subjectControllerFactory()
+const subjectsController = subjectControllerFactory()
 routes.get('/project/:pid/subjects', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
-  return subjectController.show(adapter)
+  return subjectsController.show(adapter)
 })
-routes.patch('/project/:pid/subject', (req, res, next) => {
+routes.patch('/project/:pid/subjects', (req, res, next) => {
   const adapter = new ExpressAdapter(req, res, next)
-  return subjectController.storeAndUpdate(adapter)
+  return subjectsController.storeAndUpdate(adapter)
+})
+
+const classroomController = classroomsControllerFactory()
+routes.get('/project/:pid/classrooms', (req, res, next) => {
+  const adapter = new ExpressAdapter(req, res, next)
+  return classroomController.show(adapter)
+})
+routes.patch('/project/:pid/classrooms', (req, res, next) => {
+  const adapter = new ExpressAdapter(req, res, next)
+  return classroomController.storeAndUpdate(adapter)
 })
 
 export default routes

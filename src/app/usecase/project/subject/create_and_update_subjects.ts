@@ -3,6 +3,7 @@ import { Either, left, right } from "../../../../core/types/either";
 import GetSubjects from "./get_subjects";
 import ISubjectRepository from "../../../../core/domain/contracts/repository/isubjects_repository";
 import ISubject from "../../../../core/domain/model/isubject";
+import DeleteClassesOfClassroomsThatContainsThisSubject from "../classrooms/delete_classes_of_classrooms_that_contains_this_subject";
 
 export type SubjectData = Omit<ISubject, 'id' | 'projectId'> & Partial<{id: number}>
 
@@ -11,6 +12,7 @@ export default class CreateAndUpdateSubjects{
     private isProjectOwner: IsProjectOwner,
     private subjectRepository: ISubjectRepository,
     private getSubjects: GetSubjects,
+    private deleteClassesOfClassroomsThatContainsThisSubject: DeleteClassesOfClassroomsThatContainsThisSubject
   ){}
   async exec(projectId: number, client: string, subjects: SubjectData[]) : Promise<Either<any, boolean>>{
     const isPO = await this.isProjectOwner.exec(Number(projectId), client)
@@ -44,6 +46,10 @@ export default class CreateAndUpdateSubjects{
               }
             }
             if(!subjectUpdated){
+              const resRemoveClasses = await this.deleteClassesOfClassroomsThatContainsThisSubject.exec(savedSubjects[i].id, client)
+              if(resRemoveClasses.isLeft()){
+                return left(resRemoveClasses.value)
+              }
               const resRemove = await this.subjectRepository.delete(savedSubjects[i].id)
               if(resRemove.isLeft()){
                 return left(resRemove.value)
@@ -54,7 +60,8 @@ export default class CreateAndUpdateSubjects{
           for(let t in subjects){
             const resCreate = await this.subjectRepository.create({
               name: subjects[t].name,
-              projectId: projectId
+              projectId: projectId,
+              teacherId: subjects[t].teacherId
             })
             if(resCreate.isLeft()){
               return left(resCreate.value)

@@ -13,7 +13,8 @@ class SubjectRepository implements ISubjectRepository{
         data: {
           name: props.name,
           projectId: props.projectId,
-          subjectConfigurationId: subjectConfiguration.id
+          subjectConfigurationId: subjectConfiguration.id,
+          teacherId: props.teacherId
         }
       })
       return right(subject)
@@ -44,7 +45,6 @@ class SubjectRepository implements ISubjectRepository{
           id: targetId
         }
       })
-      // !!!!!! TODO: remove from subject
       return right(true)
     }catch(e){
       return left(e)
@@ -57,7 +57,6 @@ class SubjectRepository implements ISubjectRepository{
           projectId: projectId
         }
       })
-      // !!!!!! TODO: remove from subject
       return right(true)
     }catch(e){
       return left(e)
@@ -85,12 +84,10 @@ class SubjectRepository implements ISubjectRepository{
       return left(e)
     }
   }
-  async selectAll(projectId: number): Promise<Either<any, FullISubject[]>> {
+  async selectAll(query: SearchSubjectQuery): Promise<Either<any, FullISubject[]>> {
     try{
       const subjects: any[] = await prisma.subject.findMany({
-        where: {
-          projectId: projectId
-        }
+        where: query
       })
       if(subjects.length == 0){
         return right([])
