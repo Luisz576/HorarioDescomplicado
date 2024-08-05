@@ -19,4 +19,4 @@ class ApiSocket{
   }
 }
 
-const apiSocket = ApiSocket()
+const apiSocket = new ApiSocket()

@@ -23,8 +23,9 @@ scheduleGenerateButtonLoading.addListener((loading) => {
     scheduleGenerateButtonElement.classList.remove('bg-green-950')
   }
 })
+scheduleGenerateButtonElement.onclick = schedule_generate_button_hadler
 
-function schedule_generate_button_habler(){
+function schedule_generate_button_hadler(){
   if(errorInLoading || !scheduleGenerateButtonEnabled.get()){
     return
   }
@@ -461,20 +462,20 @@ wasSubjectModified.addListener((modified) => {
   }else{
     subjectSaveIconElement.style = "display: none"
   }
+  render_subjects()
+  render_classrooms()
 })
 
 function add_new_subject(){
   subjects.push({
-    name: "Nova Sala"
+    name: "Nova Matéria"
   })
   wasSubjectModified.set(true)
-  render_subjects()
 }
 
 function remove_subject(index){
   subjects.splice(index, 1)
   wasSubjectModified.set(true)
-  render_subjects()
 }
 
 function _subjects_show_or_hide(){
@@ -597,6 +598,7 @@ wasClassroomModified.addListener((modified) => {
   }else{
     classroomSaveIconElement.style = "display: none"
   }
+  render_classrooms()
 })
 
 function add_new_classroom(){
@@ -636,10 +638,98 @@ function classroom_name_item_change_handler(index){
   render_classrooms()
 }
 
+function new_accepted_subject_item_handler(index){
+  classrooms[index].acceptedSubjects.push(-1)
+  wasClassroomModified.set(true)
+}
+
+function remove_accepted_subject_item_handler(index, indexInAcceptedSubject){
+  classrooms[index].acceptedSubjects.splice(indexInAcceptedSubject, 1)
+  wasClassroomModified.set(true)
+}
+
+function classroom_accepted_subject_item_change_handler(classroomIndex, indexInAcceptedSubject){
+  const item = document.getElementById(`classroom-list-${classroomIndex}-accepted-subject-${indexInAcceptedSubject}`)
+  const selectedValue = Number(item.value)
+  if(!isNaN(selectedValue)){
+    classrooms[classroomIndex].acceptedSubjects[indexInAcceptedSubject] = selectedValue
+  }
+  wasClassroomModified.set(true)
+}
+
 function build_classroom_item(index, classroom){
+  // build list of accepted subjects
+  function build_mult_select(){
+    // build item of accepted subjects
+    function build_item_selected(indexInAcceptedSubject, remainingSubjects){
+      const options = [] // opções que aparecem
+      options.push({id: -1, name: "-----"})
+      const optionSelected = classrooms[index].acceptedSubjects[indexInAcceptedSubject]
+      for(let o in remainingSubjects){
+        options.push(remainingSubjects[o])
+      }
+      if(optionSelected > 0){
+        for(let i in subjects){
+          if(subjects[i].id == optionSelected){
+            options.push(subjects[i])
+            break
+          }
+        }
+      }
+      let item_selected = `<div class="mt-2 flex"><select onchange="classroom_accepted_subject_item_change_handler(${index}, ${indexInAcceptedSubject})" id="classroom-list-${index}-accepted-subject-${indexInAcceptedSubject}">`
+      for(let i in options){
+        item_selected += `<option value="${options[i].id}" ${options[i].id == optionSelected ? "selected" : ""}>${options[i].name}</option>`
+      }
+      item_selected += `</select>
+        <button class="ml-2 mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_accepted_subject_item_handler(${index}, ${indexInAcceptedSubject})">-</button>
+        </div>`
+      return item_selected
+    }
+
+    // subjects that wasn't added
+    const remainingSubjects = []
+    for(let s in subjects){
+      let currentSubjectId = Number(subjects[s].id)
+      if(subjects[s].id && !isNaN(currentSubjectId)){
+        if(!classrooms[index].acceptedSubjects.includes(currentSubjectId)){
+          remainingSubjects.push({
+            id: currentSubjectId,
+            name: subjects[s].name
+          })
+        }
+      }
+    }
+    remainingSubjects.sort((a, b) => a.name.localeCompare(b.name))
+
+    let multiselect = `<button class="mt-2 bg-green-600 text-white size-6" type="button" onclick="new_accepted_subject_item_handler(${index})">+</button>
+      <div class="ml-8" id="classroom-list-${index}-subjects">`
+    if(classrooms[index].acceptedSubjects.length <= 0){
+      multiselect += `<p class="mt-2">Nenhuma matéria vinculada a esta sala!</p></div>`
+      return multiselect
+    }
+
+    for(let askey in classrooms[index].acceptedSubjects){
+      let as = classrooms[index].acceptedSubjects[askey]
+      if(as == -1){
+        multiselect += `<div class="mt-2">${build_item_selected(askey, remainingSubjects)}</div>`
+      }else{
+        for(let s in subjects){
+          let currentSubjectId = Number(subjects[s].id)
+          if(!isNaN(currentSubjectId) && currentSubjectId == as){
+            multiselect += build_item_selected(askey, remainingSubjects)
+            break
+          }
+        }
+      }
+    }
+
+    multiselect += `</div>`
+    return multiselect
+  }
   return `<div>
     <button class="mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_classroom(${index})">-</button>
     <input class="ml-2" type="text" onchange="classroom_name_item_change_handler(${index})" id="classroom-list-${index}" value="${classroom.name}">
+    ${build_mult_select()}
   </div>`
 }
 
@@ -664,6 +754,7 @@ async function load_classrooms(){
 
 async function save_classrooms(){
   // TODO
+  console.log(classrooms)
 }
 
 load_classrooms()

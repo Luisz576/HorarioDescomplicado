@@ -5,7 +5,7 @@ class Http{
   async get(url, parameters={}, headers={}){
     let v = false
     url += "?"
-    for(p in parameters){
+    for(let p in parameters){
       if(v){
         url += "&"
       }
