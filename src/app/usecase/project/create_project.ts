@@ -4,11 +4,14 @@ import IProjectRepository, { CreateProjectProps } from "../../../core/domain/con
 import configurationRepository from "../../repository/configuration/configuration_repository"
 import projectRepository from "../../repository/project_repository"
 import { Either, left, right } from "../../../core/types/either"
+import IScheduleRepository from "../../../core/domain/contracts/repository/configuration/ischedule_repository"
+import scheduleRepository from "../../repository/configuration/schedule_repository"
 
 class CreateProject{
   constructor(
     private projectRepository: IProjectRepository,
-    private configurationRepository: IConfigurationRepository
+    private configurationRepository: IConfigurationRepository,
+    private scheduleRepository: IScheduleRepository
   ){}
   async exec(props: Partial<Omit<CreateProjectProps, 'configurationId'>>): Promise<Either<any, IProject>>{
     if(props.name && props.name.trim() != "" && props.ownerId && props.ownerId.trim() != ""){
@@ -21,21 +24,27 @@ class CreateProject{
           geneticConfigurationId: gcRes.value.id
         })
         if(pcRes.isRight()){
-          const res = await this.projectRepository.create({
-            name: props.name,
-            ownerId: props.ownerId,
-            configurationId: pcRes.value.id,
-          })
-          if(res.isRight()){
-            return right(res.value)
+          const sRes = await this.scheduleRepository.create()
+          if(sRes.isRight()){
+            const res = await this.projectRepository.create({
+              name: props.name,
+              ownerId: props.ownerId,
+              configurationId: pcRes.value.id,
+              scheduleId: sRes.value.id
+            })
+            if(res.isRight()){
+              return right(res.value)
+            }else{
+              return res
+            }
           }else{
-            return res
+            left(sRes.value)
           }
         }else{
-          left(pcRes)
+          left(pcRes.value)
         }
       }else{
-        return left(gcRes)
+        return left(gcRes.value)
       }
     }
     return left(null)
@@ -44,6 +53,7 @@ class CreateProject{
 
 const createProject = new CreateProject(
   projectRepository,
-  configurationRepository
+  configurationRepository,
+  scheduleRepository
 )
 export default createProject

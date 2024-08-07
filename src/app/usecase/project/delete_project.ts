@@ -9,6 +9,8 @@ import ISubjectRepository from "../../../core/domain/contracts/repository/isubje
 import subjectRepository from "../../repository/subject_repository"
 import IClassroomsRepository from "../../../core/domain/contracts/repository/iclassrooms_repository"
 import classroomsRepository from "../../repository/classrooms_repository"
+import IScheduleRepository from "../../../core/domain/contracts/repository/configuration/ischedule_repository"
+import scheduleRepository from "../../repository/configuration/schedule_repository"
 
 class DeleteProject{
   constructor(
@@ -16,7 +18,8 @@ class DeleteProject{
     private configurationRepository: IConfigurationRepository,
     private teachersRepository: ITeachersRepository,
     private subjectRepository: ISubjectRepository,
-    private classroomsRepository: IClassroomsRepository
+    private classroomsRepository: IClassroomsRepository,
+    private scheduleRepository: IScheduleRepository
   ){}
   async exec(targetId: number, owner: string | undefined): Promise<Either<any, boolean>>{
     if(targetId && targetId > 0 && owner && owner.trim() != ""){
@@ -36,10 +39,11 @@ class DeleteProject{
             if(resProjectConfiguration.value != null){
               const resA = await this.projectRepository.delete(targetId)
               const resB = await this.configurationRepository.deleteProjectConfiguration(resProject.value.configurationId)
-              const resC = await this.configurationRepository.deleteGeneticConfiguration(resProjectConfiguration.value.geneticConfigurationId)
-              const resD = await this.teachersRepository.deleteAllFromProject(targetId)
-              const resE = await this.subjectRepository.deleteAllFromProject(targetId)
-              const resF = await this.classroomsRepository.deleteAllFromProject(targetId)
+              const resC = await this.scheduleRepository.delete(resProject.value.scheduleId)
+              const resD = await this.configurationRepository.deleteGeneticConfiguration(resProjectConfiguration.value.geneticConfigurationId)
+              const resE = await this.teachersRepository.deleteAllFromProject(targetId)
+              const resF = await this.subjectRepository.deleteAllFromProject(targetId)
+              const resG = await this.classroomsRepository.deleteAllFromProject(targetId)
               return right(
                 resA.isRight()
                 && resB.isRight()
@@ -47,6 +51,7 @@ class DeleteProject{
                 && resD.isRight()
                 && resE.isRight()
                 && resF.isRight()
+                && resG.isRight()
               )
             }
           }else{
@@ -66,6 +71,7 @@ const deleteProject = new DeleteProject(
   configurationRepository,
   teachersRepository,
   subjectRepository,
-  classroomsRepository
+  classroomsRepository,
+  scheduleRepository
 )
 export default deleteProject

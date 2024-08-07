@@ -39,6 +39,7 @@ function schedule_generate_button_hadler(){
 class ProjectData{
   #listeners = []
   constructor(project){
+    console.log(project)
     this.id = project.id
     this.name = valueObject(project.name, this.onChange.bind(this))
     this.configuration = {

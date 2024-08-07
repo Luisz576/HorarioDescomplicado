@@ -8,10 +8,11 @@ class ProjectRepository implements IProjectRepository{
   constructor(){}
   async create(props: CreateProjectProps): Promise<Either<any, IProject>> {
     try{
-      const res = await prisma.project.create({
-        data: ProjectMapper.toPrisma(props)
-      })
-      return right(res)
+      return right(
+        await prisma.project.create({
+          data: ProjectMapper.toPrisma(props)
+        })
+      )
     }catch(e){
       return left("couldn't create project: " + e)
     }

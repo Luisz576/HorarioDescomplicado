@@ -17,28 +17,9 @@ enum DayOfWeek {
   SATURDAY
 }
 
-// model Time {
-//   id         Int       @id @default(autoincrement())
-//   day        DayOfWeek
-//   startTime  Int
-//   endTime    Int
-//   Schedules  Schedule  @relation(fields: [scheduleId], references: [id])
-//   scheduleId Int
-// }
-
-// model Schedule {
-//   id        Int         @id @default(autoincrement())
-//   duration  Int         @default(5)
-//   schedule  Time[]
-//   Teacher   Teacher[]
-//   Classroom Classroom[]
-// }
-
 model Teacher {
   id        Int       @id @default(autoincrement())
   name      String
-  // schedule   Schedule  @relation(fields: [scheduleId], references: [id])
-  // scheduleId Int
   Project   Project   @relation(fields: [projectId], references: [id])
   projectId Int
   Subject   Subject[]
@@ -68,24 +49,28 @@ model ClassroomSubject {
 model Classroom {
   id               Int                @id @default(autoincrement())
   name             String
-  // schedule   Schedule  @relation(fields: [scheduleId], references: [id])
-  // scheduleId Int
   Project          Project            @relation(fields: [projectId], references: [id])
   projectId        Int
   ClassroomSubject ClassroomSubject[]
+}
+
+model ProjectSchedule{
+  id        Int         @id @default(autoincrement())
+  duration  Int         @default(5)
+  projects Project[]
 }
 
 model Project {
   id              Int           @id @default(autoincrement())
   name            String        @unique
   ownerId         String
+  configuration   Configuration @relation(fields: [configurationId], references: [id])
+  configurationId Int
+  schedule ProjectSchedule @relation(fields: [scheduleId], references: [id])
+  scheduleId Int
   classrooms      Classroom[]
   teachers        Teacher[]
   subjects        Subject[]
-  configuration   Configuration @relation(fields: [configurationId], references: [id])
-  configurationId Int
-
-  @@index([name])
 }
 
 model Configuration {

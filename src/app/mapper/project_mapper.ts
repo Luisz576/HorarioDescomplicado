@@ -5,14 +5,16 @@ export default class ProjectMapper{
     return {
       name: project.name,
       ownerId: project.ownerId,
-      configurationId: project.configurationId
+      configurationId: project.configurationId,
+      scheduleId: project.scheduleId
     }
   }
   static toPrismaPartial(project: Partial<Omit<IProject, 'id'>>){
     return {
       name: project.name,
       ownerId: project.ownerId,
-      configurationId: project.configurationId
+      configurationId: project.configurationId,
+      scheduleId: project.scheduleId
     }
   }
 }
