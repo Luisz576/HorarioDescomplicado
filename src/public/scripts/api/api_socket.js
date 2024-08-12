@@ -10,6 +10,7 @@ class ApiSocket{
     if(this.#conn){
       return
     }
+    this.#conn = io();
     // TODO: create connection
   }
 

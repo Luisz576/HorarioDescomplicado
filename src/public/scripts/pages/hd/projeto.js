@@ -804,3 +804,5 @@ async function save_classrooms(){
 
 //// Avaliable Hours ////
 // ! TODO
+
+apiSocket.generate()
