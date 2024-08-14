@@ -6,7 +6,7 @@ import apiRoutes from './app/route/api_routes'
 import authApiRoutes from './app/route/auth_api_routes'
 import prisma from './app/service/prisma'
 import socketio from 'socket.io'
-import scheduleOrganizerSocket from './app/socket/schedule_organizer_socket'
+import scheduleOrganizerSocketFactory from './app/factory/socket/schedule_organizer_socket_factory'
 
 const port = 5000
 
@@ -21,13 +21,10 @@ app.use('/', globalRoutes)
 app.use('/api/auth/', authApiRoutes)
 app.use('/api/v1/', apiRoutes)
 
+const scheduleOrganizerSocket = scheduleOrganizerSocketFactory(io)
+
 server.listen(port, () => {
   console.log(`Running at port: ${port}`)
-})
-
-io.on('connection', (socket) => {
-  console.log('New connection: ', socket.id)
-  scheduleOrganizerSocket.add(socket)
 })
 
 server.on('close', () => {

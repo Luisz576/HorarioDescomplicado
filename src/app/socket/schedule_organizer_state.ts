@@ -1,7 +1,68 @@
-import ScheduleOrganizerGenetic from "../core/schedule_organizer/schedule_organizer_genetic";
+import ScheduleOrganizerGenetic from "../../core/schedule_organizer/schedule_organizer_genetic"
+import { Either, left, right } from "../../core/types/either"
+import GetScheduleOrganizerData from "../usecase/schedule_organizer/get_schedule_organizer_data"
 
-async function run(){
-  const g = new ScheduleOrganizerGenetic({
+export default class ScheduleOrganizerState{
+  constructor(
+    private getScheduleOrganizerData: GetScheduleOrganizerData
+  ){}
+
+  authenticated = false
+  projectId: number = -1
+  #genetic: ScheduleOrganizerGenetic | undefined
+
+  async generate(emiter: (data: any) => void, onDone: () => void, onError: (error: any) => void, projectId: number){
+    this.projectId = projectId
+
+    const wasCreatedRes = await this.#createGenetic()
+    if(wasCreatedRes.isLeft()){
+      return onError("Couln't start generating")
+    }
+
+    if(this.#genetic){
+      this.#genetic.evolve(
+        this.#generationCallback.bind(this, emiter)
+      ).then(() => {
+        onDone()
+      }).catch((e) => {
+        onError(e)
+      })
+    }else{
+      onError("Couln't start generating")
+    }
+  }
+
+  #generationCallback(emiter: (data: any) => void, generation: number): boolean{
+    if(generation % 5 == 0){
+      if(this.#genetic){
+        const bestPhenotype = this.#genetic.bestPhenotype()
+        emiter({
+          generation: generation,
+          classrooms: bestPhenotype
+        })
+      }
+    }
+    return true
+  }
+
+  async #createGenetic(): Promise<Either<any, boolean>>{
+    // load data
+    const res = await this.getScheduleOrganizerData.exec(this.projectId)
+
+    if(res.isRight()){
+      const so = res.value
+      this.#genetic = new ScheduleOrganizerGenetic(so.props, so.configuration)
+      return right(true)
+    }
+
+    return left(res.value)
+  }
+}
+
+
+/*
+
+const g = new ScheduleOrganizerGenetic({
     classrooms: [
       {
         acceptedSubjects: [
@@ -203,24 +264,5 @@ async function run(){
     maxOrWithoutBetterGenerations: 250,
   })
 
-  await g.evolve((generation) => {
-    if(generation % 10 == 0){
-      console.warn('generation:', generation)
-    }
-    return true
-  })
 
-  console.log('Classe 1, Dia 1:', g.bestPhenotype()!.classrooms[0].days[0])
-  console.log('Classe 1, Dia 2:', g.bestPhenotype()!.classrooms[0].days[1])
-  console.log('Classe 1, Dia 3:', g.bestPhenotype()!.classrooms[0].days[2])
-  console.log('Classe 1, Dia 4:', g.bestPhenotype()!.classrooms[0].days[3])
-  console.log('Classe 1, Dia 5:', g.bestPhenotype()!.classrooms[0].days[4])
-  console.log('============================')
-  console.log('Classe 2, Dia 1:', g.bestPhenotype()!.classrooms[1].days[0])
-  console.log('Classe 2, Dia 2:', g.bestPhenotype()!.classrooms[1].days[1])
-  console.log('Classe 2, Dia 3:', g.bestPhenotype()!.classrooms[1].days[2])
-  console.log('Classe 2, Dia 4:', g.bestPhenotype()!.classrooms[1].days[3])
-  console.log('Classe 2, Dia 5:', g.bestPhenotype()!.classrooms[1].days[4])
-}
-
-run()
+*/

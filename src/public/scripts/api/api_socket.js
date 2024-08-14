@@ -1,21 +1,46 @@
+const EVENTS_C2S = {
+  GENERATE: "generate"
+}
+
+const EVENTS_S2C = {
+  GENERATING_STATUS: "generating_status",
+  DISCONNECT: "disconnect"
+}
+
 class ApiSocket{
-  #api_url = "http://127.0.0.1:5000/api/v1/socket"
   #conn
 
   hasConn(){
     return this.#conn != undefined
   }
 
-  async generate(){
+  #emit(event, msg){
+    this.#conn.emit(event, msg)
+  }
+
+  #listen(event, listener){
+    this.#conn.on(event, listener)
+  }
+
+  async generate(projectId, onDisconnect, onChunk){
     if(this.#conn){
       return
     }
     this.#conn = io();
-    // TODO: create connection
+    // generating status
+    this.#listen(EVENTS_S2C.GENERATING_STATUS, onChunk)
+    this.#listen(EVENTS_S2C.DISCONNECT, onDisconnect)
+
+    // authenticate
+    const authMessage = {
+      projectId: projectId,
+      authToken: auth.authToken()
+    }
+    this.#emit(EVENTS_C2S.GENERATE, authMessage)
   }
 
   disconnect(){
-    // TODO: break connection
+    this.#conn.disconnect()
     this.#conn = undefined
   }
 }

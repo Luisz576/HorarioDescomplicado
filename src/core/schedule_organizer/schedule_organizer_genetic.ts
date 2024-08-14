@@ -216,11 +216,11 @@ export default class ScheduleOrganizerGenetic{
     }
   }
 
-  async evolve(callbackEach10Generations?: (generation: number) => boolean){
+  async evolve(callbackEachGenerations?: (generation: number) => boolean){
     let run = true
     while(!this.#reachedTheStopMethod() && run){
-      if(callbackEach10Generations && this.#currentGeneration % 10 == 0){
-        run = callbackEach10Generations(this.#currentGeneration)
+      if(callbackEachGenerations){
+        run = callbackEachGenerations(this.#currentGeneration)
       }
       this.#g.evolve()
 

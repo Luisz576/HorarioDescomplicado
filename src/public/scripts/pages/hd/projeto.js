@@ -30,16 +30,15 @@ function schedule_generate_button_hadler(){
     return
   }
   scheduleGenerateButtonLoading.set(true)
-  console.warn("TODO: generate")
-  // TODO generate
-  scheduleGenerateButtonLoading.set(false)
+  apiSocket.generate(project.id, function(){
+    scheduleGenerateButtonLoading.set(false)
+  }, schedule_on_chunk_handler)
 }
 
 //// CONFIGURATION ////
 class ProjectData{
   #listeners = []
   constructor(project){
-    console.log(project)
     this.id = project.id
     this.name = valueObject(project.name, this.onChange.bind(this))
     this.configuration = {
@@ -805,4 +804,7 @@ async function save_classrooms(){
 //// Avaliable Hours ////
 // ! TODO
 
-apiSocket.generate()
+//// SCHEDULE ////
+function schedule_on_chunk_handler(chunk){
+  console.log(chunk)
+}
