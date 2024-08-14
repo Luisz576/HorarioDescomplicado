@@ -19,7 +19,7 @@ import IsProjectOwner from "../project/is_project_owner";
 import GetSubjects from "../project/subject/get_subjects";
 import GetTeachers from "../project/teacher/get_teachers";
 
-interface ScheduleOrganizerRunnerProps{
+export interface ScheduleOrganizerRunnerProps{
   props: ScheduleOrganizerProps
   configuration: Omit<IGeneticConfiguration, 'id'>
 }

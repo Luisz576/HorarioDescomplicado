@@ -88,7 +88,7 @@ export default class ScheduleOrganizerSocket{
 
   #disconnectHandler(socket: ISocket, _: any){
     console.log('Disconnection: ', socket.id)
-    this.#schedules[socket.id].running = false
+    this.#schedules[socket.id].cancel()
     delete this.#schedules[socket.id]
   }
 }
