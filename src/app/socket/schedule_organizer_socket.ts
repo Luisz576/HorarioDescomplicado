@@ -26,7 +26,8 @@ export default class ScheduleOrganizerSocket{
     this.#schedules[socket.id] = scheduleOrganizerStateFactory()
 
     // register events
-    socket.on(Client2ServerEvents.DISCONNECT, this.#disconnectHandler.bind(this, socket))
+    socket.on(Client2ServerEvents._DISCONNECT, this.#disconnectHandler.bind(this, socket))
+    socket.on(Client2ServerEvents.DISCONNECT, this.#gdisconnectHandler.bind(this, socket))
     socket.on(Client2ServerEvents.GENERATE, this.#generateHandler.bind(this, socket))
 
     // wait to remove if not authenticated
@@ -41,7 +42,7 @@ export default class ScheduleOrganizerSocket{
 
   async #_generateHandler(socket: ISocket, projectId: number, authToken: string, authentication_response: Either<any, string | undefined>){
     if(authentication_response.isRight()){
-      const clientName = this.getClientName.execute(authToken);
+      const clientName = this.getClientName.execute(authToken)
       if(!clientName){
         return false
       }
@@ -52,11 +53,13 @@ export default class ScheduleOrganizerSocket{
       // consumer
       this.#schedules[socket.id].generate(
         (chunk) => {
+          console.log("Sending chunk...")
           // emit chunk
           socket.emit(Server2ClientEvents.GENERATING_STATUS, chunk)
         },
         () => {
           // close the connection
+          console.log("Generated")
           socket.disconnect()
         },
         (error) => {
@@ -66,21 +69,26 @@ export default class ScheduleOrganizerSocket{
       , projectId)
     }
   }
-  async #generateHandler(socket: ISocket, msg: any){
+  #generateHandler(socket: ISocket, msg: any){
     if(msg && msg.projectId && msg.authToken){
       // save context
-      const callback = this.#_generateHandler.bind(this, socket, msg.authToken, msg.projectId)
+      const callback = this.#_generateHandler.bind(this, socket, msg.projectId, msg.authToken)
       // authenticate
-      await this.authenticateToken.execute({
+      this.authenticateToken.execute({
         token: msg.authToken,
         callback: callback
       })
     }
   }
 
+  #gdisconnectHandler(socket: ISocket, _: any){
+    console.log("Ask to disconnect: ", socket.id)
+    socket.disconnect()
+  }
+
   #disconnectHandler(socket: ISocket, _: any){
     console.log('Disconnection: ', socket.id)
-
+    this.#schedules[socket.id].running = false
     delete this.#schedules[socket.id]
   }
 }

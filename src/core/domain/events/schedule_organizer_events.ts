@@ -3,6 +3,7 @@ export enum Server2ClientEvents {
 }
 
 export enum Client2ServerEvents {
-  DISCONNECT = "disconnect",
+  _DISCONNECT = "disconnect",
+  DISCONNECT = "g_disconnect",
   GENERATE = "generate"
 }

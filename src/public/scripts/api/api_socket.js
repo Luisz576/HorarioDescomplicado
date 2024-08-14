@@ -1,5 +1,6 @@
 const EVENTS_C2S = {
-  GENERATE: "generate"
+  GENERATE: "generate",
+  DISCONNECT: "g_disconnect"
 }
 
 const EVENTS_S2C = {
@@ -29,6 +30,7 @@ class ApiSocket{
     this.#conn = io();
     // generating status
     this.#listen(EVENTS_S2C.GENERATING_STATUS, onChunk)
+    this.#listen(EVENTS_S2C.DISCONNECT, this.#disconnectHandler.bind(this))
     this.#listen(EVENTS_S2C.DISCONNECT, onDisconnect)
 
     // authenticate
@@ -39,9 +41,11 @@ class ApiSocket{
     this.#emit(EVENTS_C2S.GENERATE, authMessage)
   }
 
-  disconnect(){
-    this.#conn.disconnect()
+  #disconnectHandler(_){
     this.#conn = undefined
+  }
+  disconnect(){
+    this.#emit(EVENTS_C2S.DISCONNECT, "disconnect")
   }
 }
 

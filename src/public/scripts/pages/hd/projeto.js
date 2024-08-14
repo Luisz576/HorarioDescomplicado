@@ -7,6 +7,7 @@ const scheduleGenerateButtonLoading = valueObject(false)
 const scheduleViewElement = document.getElementById('schedule-view')
 const scheduleViewControllerElement = document.getElementById('schedule-view-controller')
 const scheduleGenerateButtonElement = document.getElementById('schedule-generate-button')
+const scheduleCancelGenerateButtonElement = document.getElementById('schedule-cancel-generate-button')
 scheduleGenerateButtonEnabled.addListener((enabled) => {
   scheduleGenerateButtonElement.disabled = !enabled
 })
@@ -16,14 +17,20 @@ scheduleGenerateButtonLoading.addListener((loading) => {
     scheduleGenerateButtonElement.classList.remove('bg-green-600')
     scheduleGenerateButtonElement.classList.remove('hover:bg-green-800')
     scheduleGenerateButtonElement.classList.add('bg-green-950')
+    scheduleCancelGenerateButtonElement.disabled = false
   }else{
     scheduleGenerateButtonElement.innerHTML = "Gerar"
     scheduleGenerateButtonElement.classList.add('bg-green-600')
     scheduleGenerateButtonElement.classList.add('hover:bg-green-800')
     scheduleGenerateButtonElement.classList.remove('bg-green-950')
+    scheduleCancelGenerateButtonElement.disabled = true
   }
 })
 scheduleGenerateButtonElement.onclick = schedule_generate_button_hadler
+function schedule_cancel_generate_button_habler(){
+  console.log("DISCONNECT")
+  apiSocket.disconnect()
+}
 
 function schedule_generate_button_hadler(){
   if(errorInLoading || !scheduleGenerateButtonEnabled.get()){
@@ -806,6 +813,7 @@ async function save_classrooms(){
 
 //// SCHEDULE ////
 function schedule_on_chunk_handler(chunk){
+  console.log("Receiving chunk...")
   console.log(chunk)
   // ! TODO: build based on chunk
 }

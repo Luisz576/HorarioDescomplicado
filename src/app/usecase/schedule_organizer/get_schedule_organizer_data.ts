@@ -5,8 +5,14 @@ import IProjectRepository from "../../../core/domain/contracts/repository/iproje
 import ISubjectRepository from "../../../core/domain/contracts/repository/isubjects_repository";
 import ITeachersRepository from "../../../core/domain/contracts/repository/iteachers_repository";
 import IGeneticConfiguration from "../../../core/domain/model/configuration/igenetic_configuration";
+import { FullIClassroom } from "../../../core/domain/model/iclassroom";
+import { FullIProject } from "../../../core/domain/model/iproject";
+import { FullISubject } from "../../../core/domain/model/isubject";
+import ITeacher from "../../../core/domain/model/iteacher";
 import { ScheduleOrganizerProps } from "../../../core/schedule_organizer/schedule_organizer_genetic";
 import { Either, left, right } from "../../../core/types/either";
+import { DayOfWeek } from "../../../core/utils/utils";
+import { subjectToBaseSubject } from "../../mapper/subject_mapper";
 import GetClassrooms from "../project/classrooms/get_classrooms";
 import { GetProject } from "../project/get_project";
 import IsProjectOwner from "../project/is_project_owner";
@@ -15,7 +21,7 @@ import GetTeachers from "../project/teacher/get_teachers";
 
 interface ScheduleOrganizerRunnerProps{
   props: ScheduleOrganizerProps
-  configuration: IGeneticConfiguration
+  configuration: Omit<IGeneticConfiguration, 'id'>
 }
 
 export default class GetScheduleOrganizerData{
@@ -42,7 +48,14 @@ export default class GetScheduleOrganizerData{
             const subjects = resSubjects.value
             const classrooms = resClassrooms.value
             const teachers = resTeachers.value
-            // ! TODO
+            if(subjects.length > 0 && classrooms.length > 0 && teachers.length > 0){
+              try{
+                return right(this.buildData(project, subjects, classrooms, teachers))
+              }catch(e){
+                return left(e)
+              }
+            }
+            return left("Not enought data")
           }
         }
         return left("Error loading data")
@@ -50,5 +63,52 @@ export default class GetScheduleOrganizerData{
       return left("This client isn't the owner of this project")
     }
     return left(isOwnerRes.value)
+  }
+
+  buildData(project: FullIProject, subjects: FullISubject[], classrooms: FullIClassroom[], teachers: ITeacher[]): ScheduleOrganizerRunnerProps{
+    const defaultDays: {
+      day: DayOfWeek
+      classes: number
+    }[] = [
+      {
+        day: 'MONDAY',
+        classes: 4
+      },
+      {
+        day: 'TUESDAY',
+        classes: 4
+      },
+      {
+        day: 'WEDNESDAY',
+        classes: 4
+      },
+      {
+        day: 'THUSDAY',
+        classes: 4
+      },
+      {
+        day: 'FRIDAY',
+        classes: 4
+      }
+    ]
+
+    return {
+      props: {
+        classrooms: classrooms,
+        days: defaultDays,
+        subjects: subjects.map(subjectToBaseSubject),
+        teachers: teachers
+      },
+      configuration: {
+        populationSize: project.configuration.geneticConfiguration.populationSize,
+        maxOrWithoutBetterGenerations: project.configuration.geneticConfiguration.maxOrWithoutBetterGenerations,
+        mutationRate: project.configuration.geneticConfiguration.mutationRate,
+        randomIndividualSize: project.configuration.geneticConfiguration.randomIndividualSize,
+        rankSlice: project.configuration.geneticConfiguration.rankSlice,
+        selectionMethod: project.configuration.geneticConfiguration.selectionMethod,
+        roundsOfRoulette: project.configuration.geneticConfiguration.roundsOfRoulette,
+        stopMethod: project.configuration.geneticConfiguration.stopMethod,
+      }
+    }
   }
 }
