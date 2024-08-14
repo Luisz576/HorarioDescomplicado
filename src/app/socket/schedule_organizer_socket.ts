@@ -5,6 +5,7 @@ import AuthenticateToken from '../usecase/auth/authenticate_token'
 import { Either } from '../../core/types/either'
 import ScheduleOrganizerState from './schedule_organizer_state'
 import scheduleOrganizerStateFactory from '../factory/socket/schedule_organizer_state_factory'
+import GetClientName from '../usecase/auth/get_client_name'
 
 type ISocket = socketio.Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 
@@ -13,6 +14,7 @@ export default class ScheduleOrganizerSocket{
 
   constructor(
     private io: socketio.Server,
+    private getClientName: GetClientName,
     private authenticateToken: AuthenticateToken
   ){
     this.io.on('connection', this.#connSocket.bind(this))
@@ -37,10 +39,16 @@ export default class ScheduleOrganizerSocket{
     }
   }
 
-  #_generateHandler(socket: ISocket, projectId: number, authentication_response: Either<any, string | undefined>){
+  async #_generateHandler(socket: ISocket, projectId: number, authToken: string, authentication_response: Either<any, string | undefined>){
     if(authentication_response.isRight()){
+      const clientName = this.getClientName.execute(authToken);
+      if(!clientName){
+        return false
+      }
+
       // mark as authenticated
       this.#schedules[socket.id].authenticated = true
+      this.#schedules[socket.id].clientId = clientName
       // consumer
       this.#schedules[socket.id].generate(
         (chunk) => {
@@ -61,7 +69,7 @@ export default class ScheduleOrganizerSocket{
   async #generateHandler(socket: ISocket, msg: any){
     if(msg && msg.projectId && msg.authToken){
       // save context
-      const callback = this.#_generateHandler.bind(this, socket, msg.projectId)
+      const callback = this.#_generateHandler.bind(this, socket, msg.authToken, msg.projectId)
       // authenticate
       await this.authenticateToken.execute({
         token: msg.authToken,

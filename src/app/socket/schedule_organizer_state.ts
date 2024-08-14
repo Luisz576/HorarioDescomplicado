@@ -8,6 +8,7 @@ export default class ScheduleOrganizerState{
   ){}
 
   authenticated = false
+  clientId: string | undefined
   projectId: number = -1
   #genetic: ScheduleOrganizerGenetic | undefined
 
@@ -46,8 +47,11 @@ export default class ScheduleOrganizerState{
   }
 
   async #createGenetic(): Promise<Either<any, boolean>>{
+    if(!this.clientId){
+      return left("Invalid Client")
+    }
     // load data
-    const res = await this.getScheduleOrganizerData.exec(this.projectId)
+    const res = await this.getScheduleOrganizerData.exec(this.projectId, this.clientId)
 
     if(res.isRight()){
       const so = res.value

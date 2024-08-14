@@ -7,6 +7,7 @@ import ITeachersRepository from "../../../core/domain/contracts/repository/iteac
 import IGeneticConfiguration from "../../../core/domain/model/configuration/igenetic_configuration";
 import { ScheduleOrganizerProps } from "../../../core/schedule_organizer/schedule_organizer_genetic";
 import { Either, left, right } from "../../../core/types/either";
+import IsProjectOwner from "../project/is_project_owner";
 
 interface ScheduleOrganizerRunnerProps{
   props: ScheduleOrganizerProps
@@ -15,6 +16,7 @@ interface ScheduleOrganizerRunnerProps{
 
 export default class GetScheduleOrganizerData{
   constructor(
+    private isProjectOwner: IsProjectOwner,
     private projectRepository: IProjectRepository,
     private subjectRepository: ISubjectRepository,
     private scheduleRepository: IScheduleRepository,
@@ -23,7 +25,7 @@ export default class GetScheduleOrganizerData{
     private configurationRepository: IConfigurationRepository,
   ){}
 
-  async exec(projectId: number): Promise<Either<any, ScheduleOrganizerRunnerProps>>{
+  async exec(projectId: number, clientId: string): Promise<Either<any, ScheduleOrganizerRunnerProps>>{
     return left(false)
   }
 }
