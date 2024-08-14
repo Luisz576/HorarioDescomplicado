@@ -7,7 +7,7 @@ import configurationRepository from "../../repository/configuration/configuratio
 import scheduleRepository from "../../repository/configuration/schedule_repository"
 import projectRepository from "../../repository/project_repository"
 
-class GetProject{
+export class GetProject{
   constructor(
     private projectRepository: IProjectRepository,
     private configurationRepository: IConfigurationRepository,
