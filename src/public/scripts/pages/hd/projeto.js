@@ -812,8 +812,29 @@ async function save_classrooms(){
 // ! TODO
 
 //// SCHEDULE ////
+const schedule_table_data = valueObject({})
 function schedule_on_chunk_handler(chunk){
   console.log("Receiving chunk...")
-  console.log(chunk)
-  // ! TODO: build based on chunk
+  schedule_table_data.set(chunk)
+}
+
+schedule_table_data.addListener((data) => {
+  scheduleViewElement.innerHTML = ""
+  // Update table
+  buildScheduleViewTable(data)
+})
+
+function buildScheduleViewTable(data){
+  function buildLine(classroom){
+    console.log(classroom)
+    // ! TODO
+    return ""
+  }
+  if(data.classrooms && data.classrooms.length > 0){
+    scheduleViewElement.innerHTML += "<table>"
+    for(let c in data.classrooms){
+      scheduleViewElement.innerHTML += buildLine(data.classrooms[c])
+    }
+    scheduleViewElement.innerHTML += "</table>"
+  }
 }

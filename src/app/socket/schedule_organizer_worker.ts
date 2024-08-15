@@ -27,12 +27,14 @@ if(isMainThread){
 
       worker.on('error', (error) => {
         onError(error)
-        reject(error)
+        resolve(100)
       });
 
       worker.on('exit', (code) => {
-        if (code !== 0)
-          reject(new Error(`Worker stopped with exit code ${code}`));
+        if (code !== 0){
+          onError(new Error(`Worker stopped with exit code ${code}`));
+          resolve(100)
+        }
       });
     });
   }
