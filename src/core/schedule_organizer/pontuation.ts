@@ -1,12 +1,12 @@
 const PONTUATION = {
   // penality
   emptyClassPenality: 1,
-  emptyClassInBegin: 8,
+  emptyClassInBegin: 6,
   differentAmountOfClassesPenality: 15,
   classesAtSameTimePenality: 20,
-  minClassesPenality: 8,
-  maxClassesPenality: 8,
-  prefferMaxClassesPenality: 10,
+  minClassesPenality: 10,
+  maxClassesPenality: 10,
+  prefferMaxClassesPenality: 14,
 }
 
 export default PONTUATION
