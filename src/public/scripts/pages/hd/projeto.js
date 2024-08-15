@@ -602,8 +602,8 @@ function save_subject_configuration(){
 
     if(isNaN(newMinConsecutiveClasses)
       || isNaN(newMaxConsecutiveClasses)
-      || newMinConsecutiveClasses > 0 && newMaxConsecutiveClasses < 24
-      || newMaxConsecutiveClasses > 0 && newMaxConsecutiveClasses < 24){
+      || newMinConsecutiveClasses < 0 || newMaxConsecutiveClasses > 24
+      || newMaxConsecutiveClasses < 0 || newMaxConsecutiveClasses > 24){
       return
     }
 
