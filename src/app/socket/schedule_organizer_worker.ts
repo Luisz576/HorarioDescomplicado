@@ -1,37 +1,49 @@
-import { parentPort, workerData } from 'worker_threads'
-import ScheduleOrganizerGenetic from '../../core/schedule_organizer/schedule_organizer_genetic'
-import { Either, left } from '../../core/types/either'
+import { isMainThread, parentPort, Worker, workerData } from 'worker_threads'
+// import ScheduleOrganizerGenetic from '../../core/schedule_organizer/schedule_organizer_genetic'
+import { ScheduleOrganizerRunnerProps } from '../usecase/schedule_organizer/get_schedule_organizer_data'
+import ScheduleOrganizerGenetic from '../../core/schedule_organizer/schedule_organizer_genetic';
 
-class ScheduleOrganizerWorker{
-  running = true
-  genetic: ScheduleOrganizerGenetic | undefined
+if(isMainThread){
+  module.exports = async function scheduleOrganizerWorker(
+    so: ScheduleOrganizerRunnerProps,
+    onMessage: (msg: any) => void,
+    onError: (error: any) => void,
+    onDone: () => void,
+    getWorker: (worker: Worker) => void,
+  ){
+    new Promise((resolve, reject) => {
+      const worker = new Worker(__filename, {
+        workerData: so,
+      });
+      getWorker(worker)
 
-  async schedule_organizer_worker(){
-    console.warn(workerData)
-    setTimeout(() => parentPort?.postMessage(200), 10000)
-    return
-    this.genetic = new ScheduleOrganizerGenetic(workerData.phenotypeProps, workerData.geneticConfiguration)
-    await workerData.genetic.evolve(this.geneticCallback.bind(this))
-    parentPort?.postMessage(200)
+      worker.on('message', (msg) => {
+        if(msg == 200){
+          onDone()
+          return resolve(msg)
+        }
+        onMessage(msg)
+      });
+
+      worker.on('error', (error) => {
+        onError(error)
+        reject(error)
+      });
+
+      worker.on('exit', (code) => {
+        if (code !== 0)
+          reject(new Error(`Worker stopped with exit code ${code}`));
+      });
+    });
   }
-
-  geneticCallback(generation: number){
+}else{
+  const genetic = new ScheduleOrganizerGenetic(workerData.props, workerData.configuration)
+  genetic.evolve((generation) => {
     if(generation % 10 == 0){
-      if(this.genetic){
-        const bestPhenotype = this.genetic.bestPhenotype()
-        parentPort?.postMessage({
-          generation: generation,
-          classrooms: bestPhenotype
-        })
-      }
+      parentPort?.postMessage(genetic.bestPhenotype())
     }
-    return this.running
-  }
-
-  work(){
-    this.schedule_organizer_worker()
-  }
+    return true
+  })
+  .then(() => parentPort?.postMessage(200))
+  .catch(() => parentPort?.postMessage(100))
 }
-
-const worker = new ScheduleOrganizerWorker()
-worker.work()

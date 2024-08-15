@@ -1,6 +1,6 @@
 import { Either, left, right } from "../../core/types/either"
 import GetScheduleOrganizerData, { ScheduleOrganizerRunnerProps } from "../usecase/schedule_organizer/get_schedule_organizer_data"
-import { Worker } from "worker_threads"
+import scheduleOrganizerWorker from './schedule_organizer_worker'
 
 export default class ScheduleOrganizerState{
   constructor(
@@ -10,28 +10,29 @@ export default class ScheduleOrganizerState{
   authenticated = false
   clientId: string | undefined
   projectId: number = -1
+  worker: Worker | undefined
+
+  #getWorker(worker: Worker){
+    this.worker = worker
+  }
 
   async #executer(emiter: (data: any) => void, onDone: () => void, onError: (error: any) => void){
     const resGeneticData = await this.createGeneticData()
     if(resGeneticData.isRight()){
-      // Create a Worker
-      const worker = new Worker('./src/app/socket/schedule_organizer_worker.ts', {
-        workerData: {
-          phenotypeProps: resGeneticData.value.props,
-          geneticConfiguration: resGeneticData.value.configuration,
-        }
-      })
-      worker.on('message', (value) => {
-        if(value == 200){
-          onDone()
-          return
-        }
-        emiter(value)
-      })
-      worker.on("error", (msg) => {
-        console.error("Erro na thread")
-        onError(msg)
-      });
+      const so = resGeneticData.value
+      scheduleOrganizerWorker(so,
+        (msg: any) => {
+          if(msg == 200){
+            return onDone()
+          }else if(msg == 100){
+            return onError(100)
+          }
+          return emiter(msg)
+        },
+        onError,
+        onDone,
+        this.#getWorker.bind(this)
+      )
     }else{
       onError(resGeneticData.value)
     }
@@ -52,7 +53,10 @@ export default class ScheduleOrganizerState{
   }
 
   cancel() {
-    // ! TODO:
+    if(this.worker){
+      console.log("Terminate Worker")
+      this.worker.terminate()
+    }
   }
 
   generate(emiter: (data: any) => void, onDone: () => void, onError: (error: any) => void, projectId: number){
