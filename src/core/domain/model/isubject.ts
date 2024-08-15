@@ -6,7 +6,7 @@ export default interface ISubject{
   subjectConfigurationId: number
 }
 
-interface SubjectConfiguration {
+export interface SubjectConfiguration {
   id: number
   minConsecutiveClasses: number
   maxConsecutiveClasses: number

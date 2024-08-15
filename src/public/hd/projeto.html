@@ -195,14 +195,15 @@
             <!-- TODO: FEATURE -> EXPORT -->
           </div>
           <div class="mt-4">
-            <div id="schedule-view"></div>
             <div class="mt-4" id="schedule-view-controller">
               <button class="bg-green-600 px-4 py-2 text-lg font-bold hover:bg-green-800 text-white disabled:bg-zinc-800" id="schedule-generate-button" onclick="schedule_generate_button_habler()" disabled>Gerar</button>
               <button class="bg-red-600 px-4 py-2 text-lg font-bold hover:bg-red-800 text-white disabled:bg-zinc-800" id="schedule-cancel-generate-button" onclick="schedule_cancel_generate_button_habler()" disabled>Cancelar</button>
             </div>
+            <div class="mt-4" id="schedule-view"></div>
           </div>
         </div>
       </div>
+      <!-- DELETE PROJECT -->
       <div id="delete-project-model" tabindex="-1" aria-hidden="true" style="display: none;" class="w-full h-full overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center md:inset-0">
         <div class="fixed w-full h-full max-w-2xl max-h-full">
           <div class="fixed w-full h-full bg-zinc-800 opacity-40" onclick="delete_project_model()"></div>
@@ -220,6 +221,50 @@
                       Deletar
                     </button>
                     <button class="ml-4 text-zinc-950 hover:text-zinc-400" onclick="delete_project_model()">
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- EDIT SUBJECT -->
+      <div id="edit-subject-model" tabindex="-1" aria-hidden="true" style="display: none;" class="w-full h-full overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center md:inset-0">
+        <div class="fixed w-full h-full max-w-2xl max-h-full">
+          <div class="fixed w-full h-full bg-zinc-800 opacity-40" onclick="show_hide_subject_configuration(-1)"></div>
+          <div class="absolute w-screen min-h-screen flex">
+            <div class="relative mx-auto my-auto bg-zinc-50 rounded-lg shadow" style="width: 30%;">
+              <div>
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                  <h4 class="font-bold text-zinc-950 text-lg">Configurações da matéria</h4>
+                  <input type="hidden" id="edit-subject-model-id">
+                </div>
+                <!-- Modal Footer -->
+                <div class="border-b rounded-t mx-4 my-2">
+                  <p class="text-md underline font-bold tex-zinc-950" id="edit-subject-model-name"></p>
+                  <div class="mt-2 flex">
+                    <p>Minimo de aulas consecutivas:</p>
+                    <input class="ml-2 border-2" type="number" min="1" max="24" id="edit-subject-model-min-consecutive-classes">
+                  </div>
+                  <div class="mt-2 flex">
+                    <p>Máximo de aulas consecutivas:</p>
+                    <input class="ml-2 border-2" type="number" min="1" max="24" id="edit-subject-model-max-consecutive-classes">
+                  </div>
+                  <div class="mt-2 flex">
+                    <p>Preferir maximo de aulas?</p>
+                    <input class="ml-2" type="checkbox" id="edit-subject-model-preffer-max-consecutive-classes">
+                  </div>
+                </div>
+                <!-- Modal footer -->
+                <div class="flex p-4 md:p-5 border-t border-gray-200 rounded-b">
+                  <div class="w-max flex justify-stretch">
+                    <button class="bg-green-700 py-1 px-4 text-white text-lg hover:bg-green-900" onclick="save_subject_configuration()">
+                      Manter
+                    </button>
+                    <button class="ml-4 text-zinc-950 hover:text-zinc-400" onclick="show_hide_subject_configuration(-1)">
                       Cancelar
                     </button>
                   </div>

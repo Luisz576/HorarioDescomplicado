@@ -464,6 +464,14 @@ function getSubjectById(id){
     name: "-------"
   }
 }
+function getSubjectIndexById(id){
+  for(let s = 0; s < subjects.length; s++){
+    if(subjects[s].id == id){
+      return s
+    }
+  }
+  return -1
+}
 
 const subjectListElement = document.getElementById('subjects-list')
 const subjectSaveIconElement = document.getElementById('subject-save-icon-element')
@@ -549,11 +557,63 @@ function build_subject_item(index, subject){
     component += `</select>`
     return component
   }
-  return `<div>
+  return `<div class="flex hover:cursor-pointer">
     <button class="mt-2 bg-red-600 text-white size-6" type="button" onclick="remove_subject(${index})">-</button>
     <input class="ml-2" type="text" onchange="subject_name_item_change_handler(${index})" id="subject-list-${index}" value="${subject.name}">
     ${build_select()}
+    <div onclick="show_hide_subject_configuration(${subject.id})" class="flex items-center ml-2">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+      </svg>
+    </div>
   </div>`
+}
+// MODAL Edit Subject Config
+const editSubjectModelElement = document.getElementById('edit-subject-model')
+const editSubjectModelIdElement = document.getElementById('edit-subject-model-id')
+const editSubjectModelNameElement = document.getElementById('edit-subject-model-name')
+const editSubjectModelMinConsecutiveClassesElement = document.getElementById('edit-subject-model-min-consecutive-classes')
+const editSubjectModelMaxConsecutiveClassesElement = document.getElementById('edit-subject-model-max-consecutive-classes')
+const editSubjectModelPrefferMaxConsecutiveClassesElement = document.getElementById('edit-subject-model-preffer-max-consecutive-classes')
+function show_hide_subject_configuration(index){
+  if(isNaN(Number(index)) || Number(index) == -1){
+    editSubjectModelElement.style = "display: none;"
+    return
+  }
+  editSubjectModelElement.style = ""
+  const subjectData = getSubjectById(Number(index))
+
+  editSubjectModelIdElement.value = subjectData.id
+  editSubjectModelNameElement.innerHTML = subjectData.name
+
+  editSubjectModelMinConsecutiveClassesElement.value = subjectData.subjectConfiguration.minConsecutiveClasses
+  editSubjectModelMaxConsecutiveClassesElement.value = subjectData.subjectConfiguration.maxConsecutiveClasses
+  editSubjectModelPrefferMaxConsecutiveClassesElement.checked  = subjectData.subjectConfiguration.preferMaxConsecutiveClasses
+}
+
+function save_subject_configuration(){
+  const subjectTargetId = Number(editSubjectModelIdElement.value)
+  if(!isNaN(subjectTargetId) && Number(editSubjectModelMinConsecutiveClassesElement.value) && Number(editSubjectModelMaxConsecutiveClassesElement.value)){
+    const subjectIndex = getSubjectIndexById(subjectTargetId)
+
+    const newMinConsecutiveClasses = Number(editSubjectModelMinConsecutiveClassesElement.value)
+    const newMaxConsecutiveClasses = Number(editSubjectModelMaxConsecutiveClassesElement.value)
+
+    if(isNaN(newMinConsecutiveClasses)
+      || isNaN(newMaxConsecutiveClasses)
+      || newMinConsecutiveClasses > 0 && newMaxConsecutiveClasses < 24
+      || newMaxConsecutiveClasses > 0 && newMaxConsecutiveClasses < 24){
+      return
+    }
+
+    subjects[subjectIndex].subjectConfiguration.minConsecutiveClasses = newMinConsecutiveClasses
+    subjects[subjectIndex].subjectConfiguration.maxConsecutiveClasses = newMaxConsecutiveClasses
+    subjects[subjectIndex].subjectConfiguration.preferMaxConsecutiveClasses = editSubjectModelPrefferMaxConsecutiveClassesElement.checked
+
+    wasSubjectModified.set(true)
+  }
+  show_hide_subject_configuration(-1)
 }
 
 function render_subjects(){
@@ -845,32 +905,37 @@ function buildScheduleView(data){
   }
 }
 function buildScheduleViewTable(classroom, i){
-  let content = `<div><h3 class="text-zinc-950 font-bold">Sala ${classrooms[i].name}</h3>` // ! VERIFICAR ORDEM SALAS
-  for(let d = 0; d < classroom.days.length; d++){
-    content += buildDayTable(classroom.days[d], d)
+  let content = `
+    <div class="mb-2">
+    <h3 class="text-zinc-950 font-bold text-xl">Sala ${classrooms[i].name}</h3>
+  ` // ! VERIFICAR ORDEM SALAS
+  for(let day = 0; day < classroom.schedule.length; day++){
+    content += buildDayTable(classroom.schedule[day], day)
   }
   content += "</div>"
   return content
 }
 const DAYS = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA"] // ? Mockado
 function buildDayTable(classes, day){
-  let dtContent = `<h4 class="mt-2 text-zinc-950 font-medium">${DAYS[day]}</h4><table class="mt-2 border-collapse table-auto w-3/4 text-sm">`
+  let dtContent = `<div class="mt-4">
+    <h4 class="mt-4 text-zinc-950 font-medium">${DAYS[day]}</h4>
+    <div class="grid grid-cols-2 w-3/4 p-0 m-0 mt-2">`
   dtContent += buildSubjectTableRow(undefined, -1)
-  for(let s = 0; s < classes.subjects.length; s++){
-    dtContent += buildSubjectTableRow(classes.subjects[s], s)
+  for(let s = 0; s < classes.length; s++){
+    dtContent += buildSubjectTableRow(classes[s], s)
   }
-  dtContent += "</table>"
+  dtContent += "</div>"
   return dtContent
 }
 function buildSubjectTableRow(subject, row){
   if(row == -1){
-    return `<tr class="border-b dark:border-slate-600 p-4 pl-8 pt-0 pb-3 text-zinc-950 font-bold text-left">
-              <th>Horário</th>
-              <th>Matéria</th>
-            </tr>`
+    return `
+      <div class="border-b dark:border-slate-600 p-4 pl-8 pt-0 pb-3 text-zinc-950 font-bold text-left">Horario</div>
+      <div class="border-b dark:border-slate-600 p-4 pl-8 pt-0 pb-3 text-zinc-950 font-bold text-left">Matéria</div>
+    `
   }
-  return `<tr class="border-b dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-zinc-950 text-left">
-            <td>Horário ${row+1}</td>
-            <td>${subject.id == -1 ? "--------" : getSubjectById(subject.id).name}</td>
-          </tr>`
+  return `
+      <div class="border-b dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-zinc-950 text-left text-sm">Horário ${row+1}</div>
+      <div class="border-b dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-zinc-950 text-left text-sm">${subject.id == -1 ? "--------" : getSubjectById(subject.id).name}</div>
+    `
 }

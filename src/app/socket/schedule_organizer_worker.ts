@@ -2,6 +2,7 @@ import { isMainThread, parentPort, Worker, workerData } from 'worker_threads'
 // import ScheduleOrganizerGenetic from '../../core/schedule_organizer/schedule_organizer_genetic'
 import { ScheduleOrganizerRunnerProps } from '../usecase/schedule_organizer/get_schedule_organizer_data'
 import ScheduleOrganizerGenetic from '../../core/schedule_organizer/schedule_organizer_genetic';
+import { meta_phenotype_to_json } from '../mapper/phenotype_mapper';
 
 if(isMainThread){
   module.exports = async function scheduleOrganizerWorker(
@@ -41,11 +42,11 @@ if(isMainThread){
 }else{
   const genetic = new ScheduleOrganizerGenetic(workerData.props, workerData.configuration)
   genetic.evolve((generation) => {
-    if(generation % 10 == 0 || generation == 2){
-      const bestPhenotype = genetic.bestPhenotype()
+    if(generation % 5 == 0 || generation == 2){
+      const bestPhenotype = genetic.metaBestPhenotype()
       if(bestPhenotype){
         const chunk = {
-          classrooms: bestPhenotype.classrooms,
+          classrooms: meta_phenotype_to_json(bestPhenotype).classrooms,
           generation: generation
         }
         parentPort?.postMessage(chunk)

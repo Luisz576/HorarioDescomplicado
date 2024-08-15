@@ -22,17 +22,37 @@ class SubjectRepository implements ISubjectRepository{
       return left(e)
     }
   }
-  async update(targetId: number, data: Partial<ISubject>): Promise<Either<any, Boolean>> {
+  async update(targetId: number, data: Partial<FullISubject>): Promise<Either<any, Boolean>> {
     try{
-      await prisma.subject.update({
+      const subject = await prisma.subject.update({
         data: {
           name: data.name,
-          teacherId: data.teacherId ? data.teacherId : null,
+          teacherId: data.teacherId ? data.teacherId : null
         },
         where: {
           id: targetId
         }
       })
+      if(data.subjectConfiguration){
+        let min = data.subjectConfiguration.minConsecutiveClasses
+        if(min < 0 || min > 24){
+          min = 2
+        }
+        let max = data.subjectConfiguration.maxConsecutiveClasses
+        if(max < 0 || max > 24){
+          max = 4
+        }
+        await prisma.subjectConfiguration.update({
+          data: {
+            minConsecutiveClasses: min,
+            maxConsecutiveClasses: max,
+            preferMaxConsecutiveClasses: data.subjectConfiguration.preferMaxConsecutiveClasses,
+          },
+          where: {
+            id: subject.subjectConfigurationId
+          }
+        })
+      }
       return right(true)
     }catch(e){
       return left(e)

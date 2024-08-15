@@ -8,6 +8,7 @@ import randomInt from "../functions/random_int"
 import cloneJson from "../functions/clone_json"
 import PONTUATION from "./pontuation"
 import metaScheduleOrganizerPhenotypeBuilder, { getSubjectById } from "./phenotype/meta_phenotype_builder"
+import MetaScheduleOrganizerPhenotype from "./phenotype/meta_phenotype"
 
 export interface BaseSubject{
   id: number
@@ -16,6 +17,7 @@ export interface BaseSubject{
 }
 export interface ScheduleOrganizerProps{
   classrooms: {
+    id: number,
     acceptedSubjects: {
       subjectId: number
       classes: number
@@ -206,6 +208,12 @@ export default class ScheduleOrganizerGenetic{
 
   bestPhenotype(): ScheduleOrganizerPhenotype | undefined{
     return this.#bestPhenotype
+  }
+  metaBestPhenotype(): MetaScheduleOrganizerPhenotype | undefined{
+    if(this.#bestPhenotype){
+      return metaScheduleOrganizerPhenotypeBuilder(this.#phenotypeProps, this.#bestPhenotype)
+    }
+    return undefined
   }
 
   #reachedTheStopMethod(): boolean{
