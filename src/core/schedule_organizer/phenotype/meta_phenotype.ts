@@ -1,5 +1,6 @@
 interface DataClassroom{
-  id: number
+  id: number,
+  realId: number
 }
 
 interface DataDay{
@@ -18,6 +19,7 @@ type MetaSubject = DataSubject & {
 
 interface MetaClassroom{
   id: number
+  realId: number
   schedule: Map<number, DataSubject[]>
   totalAmountOfClassesBySubject: Map<number, number>
 }
@@ -66,6 +68,7 @@ export default class MetaScheduleOrganizerPhenotype{
     if(!this.classrooms.has(classroom.id)){
       this.classrooms.set(classroom.id, {
         id: classroom.id,
+        realId: classroom.realId,
         schedule: new Map(),
         totalAmountOfClassesBySubject: new Map(),
       })

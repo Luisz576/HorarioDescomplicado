@@ -30,7 +30,8 @@ export default function metaScheduleOrganizerPhenotypeBuilder(pProps: ScheduleOr
       for(let s = 0; s < day.subjects.length; s++){
         let subject = day.subjects[s]
         meta.addCDS({
-          id: c
+          id: c,
+          realId: pProps.classrooms[c].id
         },
         {
           id: d

@@ -7,7 +7,7 @@ export function meta_phenotype_to_json(phenotype: MetaScheduleOrganizerPhenotype
     if(!croom) continue
 
     classrooms.push({
-      id: croom.id,
+      id: croom.realId,
       schedule: Array.from(croom.schedule.values())
     })
   }

@@ -665,6 +665,14 @@ async function save_subject(){
 var wasClassroomModified = valueObject(false)
 var classroomsVisible = false
 const classrooms = []
+function getClassroomById(id){
+  for(let c in classrooms){
+    if(classrooms[c].id == id){
+      return classrooms[c]
+    }
+  }
+  return undefined
+}
 
 const classroomsListElement = document.getElementById('classrooms-list')
 const classroomSaveIconElement = document.getElementById('classroom-save-icon-element')
@@ -904,13 +912,13 @@ function buildScheduleView(data){
     }
   }
 }
-function buildScheduleViewTable(classroom, i){
+function buildScheduleViewTable(classroomData, i){
   let content = `
     <div class="mb-2">
-    <h3 class="text-zinc-950 font-bold text-xl">Sala ${classrooms[i].name}</h3>
-  ` // ! VERIFICAR ORDEM SALAS
-  for(let day = 0; day < classroom.schedule.length; day++){
-    content += buildDayTable(classroom.schedule[day], day)
+    <h3 class="text-zinc-950 font-bold text-xl">Sala ${getClassroomById(classroomData.id).name}</h3>
+  `
+  for(let day = 0; day < classroomData.schedule.length; day++){
+    content += buildDayTable(classroomData.schedule[day], day)
   }
   content += "</div>"
   return content
