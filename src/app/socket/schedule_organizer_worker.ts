@@ -41,8 +41,18 @@ if(isMainThread){
 }else{
   const genetic = new ScheduleOrganizerGenetic(workerData.props, workerData.configuration)
   genetic.evolve((generation) => {
-    if(generation % 10 == 0){
-      parentPort?.postMessage(genetic.bestPhenotype())
+    if(generation % 10 == 0 || generation == 2){
+      const bestPhenotype = genetic.bestPhenotype()
+      if(bestPhenotype){
+        const chunk = {
+          classrooms: bestPhenotype.classrooms,
+          generation: generation
+        }
+        parentPort?.postMessage(chunk)
+      }else{
+        console.error("BestPhenotype can't be undefined!")
+        return false
+      }
     }
     return true
   })

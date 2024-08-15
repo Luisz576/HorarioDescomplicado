@@ -453,6 +453,17 @@ load_project()
 var wasSubjectModified = valueObject(false)
 var subjectsVisible = false
 const subjects = []
+function getSubjectById(id){
+  for(let s in subjects){
+    if(subjects[s].id == id){
+      return subjects[s]
+    }
+  }
+  return {
+    id: -1,
+    name: "-------"
+  }
+}
 
 const subjectListElement = document.getElementById('subjects-list')
 const subjectSaveIconElement = document.getElementById('subject-save-icon-element')
@@ -819,22 +830,47 @@ function schedule_on_chunk_handler(chunk){
 }
 
 schedule_table_data.addListener((data) => {
-  scheduleViewElement.innerHTML = ""
+  console.log(data)
   // Update table
-  buildScheduleViewTable(data)
+  buildScheduleView(data)
 })
 
-function buildScheduleViewTable(data){
-  function buildLine(classroom){
-    console.log(classroom)
-    // ! TODO
-    return ""
-  }
-  if(data.classrooms && data.classrooms.length > 0){
-    scheduleViewElement.innerHTML += "<table>"
-    for(let c in data.classrooms){
-      scheduleViewElement.innerHTML += buildLine(data.classrooms[c])
+function buildScheduleView(data){
+  scheduleViewElement.innerHTML = ""
+  if(data.generation && data.classrooms && data.classrooms.length > 0){
+    scheduleViewElement.innerHTML = `<p class="text-zinc-950">Geração atual: ${data.generation}</p>`
+    for(let c = 0; c < data.classrooms.length; c++){
+      scheduleViewElement.innerHTML += buildScheduleViewTable(data.classrooms[c], c)
     }
-    scheduleViewElement.innerHTML += "</table>"
   }
+}
+function buildScheduleViewTable(classroom, i){
+  let content = `<div><h3 class="text-zinc-950 font-bold">Sala ${classrooms[i].name}</h3>` // ! VERIFICAR ORDEM SALAS
+  for(let d = 0; d < classroom.days.length; d++){
+    content += buildDayTable(classroom.days[d], d)
+  }
+  content += "</div>"
+  return content
+}
+const DAYS = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA"] // ? Mockado
+function buildDayTable(classes, day){
+  let dtContent = `<h4 class="mt-2 text-zinc-950 font-medium">${DAYS[day]}</h4><table class="mt-2 border-collapse table-auto w-3/4 text-sm">`
+  dtContent += buildSubjectTableRow(undefined, -1)
+  for(let s = 0; s < classes.subjects.length; s++){
+    dtContent += buildSubjectTableRow(classes.subjects[s], s)
+  }
+  dtContent += "</table>"
+  return dtContent
+}
+function buildSubjectTableRow(subject, row){
+  if(row == -1){
+    return `<tr class="border-b dark:border-slate-600 p-4 pl-8 pt-0 pb-3 text-zinc-950 font-bold text-left">
+              <th>Horário</th>
+              <th>Matéria</th>
+            </tr>`
+  }
+  return `<tr class="border-b dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-zinc-950 text-left">
+            <td>Horário ${row+1}</td>
+            <td>${subject.id == -1 ? "--------" : getSubjectById(subject.id).name}</td>
+          </tr>`
 }
