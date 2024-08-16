@@ -42,7 +42,7 @@ if(isMainThread){
 }else{
   const genetic = new ScheduleOrganizerGenetic(workerData.props, workerData.configuration)
   genetic.evolve((generation) => {
-    if(generation % 5 == 0 || generation == 2){
+    if(generation > 1){
       const bestPhenotype = genetic.metaBestPhenotype()
       if(bestPhenotype){
         const chunk = {
